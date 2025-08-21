@@ -85,7 +85,7 @@ function TeamMembersSkeleton() {
   return (
     <Card className="mb-8 h-[140px]">
       <CardHeader>
-        <CardTitle>Team Members</CardTitle>
+        <CardTitle>我的团队</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="animate-pulse space-y-4 mt-1">
@@ -158,7 +158,7 @@ function TeamMembers() {
                     {getUserDisplayName(member.user)}
                   </p>
                   <p className="text-sm text-muted-foreground capitalize">
-                    {member.role}
+                    {member.role === 'owner' ? '领导者' : '成员'}
                   </p>
                 </div>
               </div>
@@ -219,7 +219,7 @@ function InviteTeamMember() {
               id="email"
               name="email"
               type="email"
-              placeholder="Enter email"
+              placeholder="请输入邮箱"
               required
               disabled={!isOwner}
             />
@@ -287,7 +287,7 @@ export default function SettingsPage() {
   return (
     <section className="flex-1 p-4 lg:p-8">
       <h1 className="text-lg lg:text-2xl font-medium mb-6">个人信息</h1>
-      <Card>
+      <Card className="mb-8">
         <CardHeader>
           <CardTitle>账号信息</CardTitle>
         </CardHeader>
@@ -313,7 +313,7 @@ export default function SettingsPage() {
                   保存中...
                 </>
               ) : (
-                'Save Changes'
+                '保存'
               )}
             </Button>
           </form>
