@@ -15,10 +15,10 @@ export default function DashboardLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navItems = [
-    { href: '/dashboard', icon: Users, label: 'Team' },
-    { href: '/dashboard/general', icon: Settings, label: 'General' },
-    { href: '/dashboard/activity', icon: Activity, label: 'Activity' },
-    { href: '/dashboard/security', icon: Shield, label: 'Security' }
+    { href: '/dashboard', icon: Users, label: '个人信息' },
+    { href: '/dashboard/general', icon: Settings, label: '核心功能' },
+    { href: '/dashboard/activity', icon: Activity, label: '活跃记录' },
+    { href: '/dashboard/security', icon: Shield, label: '安全设置' }
   ];
 
   return (

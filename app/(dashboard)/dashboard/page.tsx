@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { useActionState } from 'react';
 import { TeamDataWithMembers, User } from '@/lib/db/schema';
-import { removeTeamMember, inviteTeamMember } from '@/app/(login)/actions';
+import { updateAccount, removeTeamMember, inviteTeamMember } from '@/app/(login)/actions';
 import useSWR from 'swr';
 import { Suspense } from 'react';
 import { Input } from '@/components/ui/input';
@@ -19,50 +19,65 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Loader2, PlusCircle } from 'lucide-react';
 
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 type ActionState = {
+  name?: string;
   error?: string;
   success?: string;
 };
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+type AccountFormProps = {
+  state: ActionState;
+  nameValue?: string;
+  emailValue?: string;
+};
 
-function SubscriptionSkeleton() {
+function AccountForm({
+  state,
+  nameValue = '',
+  emailValue = ''
+}: AccountFormProps) {
   return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
-      </CardHeader>
-    </Card>
+    <>
+      <div>
+        <Label htmlFor="name" className="mb-2">
+          昵称
+        </Label>
+        <Input
+          id="name"
+          name="name"
+          placeholder="请输入你的昵称"
+          defaultValue={state.name || nameValue}
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="email" className="mb-2">
+          邮箱
+        </Label>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="请输入你的邮箱"
+          defaultValue={emailValue}
+          required
+        />
+      </div>
+    </>
   );
 }
 
-function ManageSubscription() {
-  const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
-
+function AccountFormWithData({ state }: { state: ActionState }) {
+  const { data: user } = useSWR<User>('/api/user', fetcher);
   return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Team Subscription</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div className="mb-4 sm:mb-0">
-              <p className="font-medium">
-                Current Plan: {teamData?.planName || 'Free'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {teamData?.subscriptionStatus === 'active'
-                  ? 'Billed monthly'
-                  : teamData?.subscriptionStatus === 'trialing'
-                  ? 'Trial period'
-                  : 'No active subscription'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <AccountForm
+      state={state}
+      nameValue={user?.name ?? ''}
+      emailValue={user?.email ?? ''}
+    />
   );
 }
 
@@ -102,10 +117,10 @@ function TeamMembers() {
     return (
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Team Members</CardTitle>
+          <CardTitle>我的团队</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">No team members yet.</p>
+          <p className="text-muted-foreground">暂无</p>
         </CardContent>
       </Card>
     );
@@ -114,7 +129,7 @@ function TeamMembers() {
   return (
     <Card className="mb-8">
       <CardHeader>
-        <CardTitle>Team Members</CardTitle>
+        <CardTitle>我的团队</CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="space-y-4">
@@ -175,7 +190,7 @@ function InviteTeamMemberSkeleton() {
   return (
     <Card className="h-[260px]">
       <CardHeader>
-        <CardTitle>Invite Team Member</CardTitle>
+        <CardTitle>邀请团队成员</CardTitle>
       </CardHeader>
     </Card>
   );
@@ -192,13 +207,13 @@ function InviteTeamMember() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Invite Team Member</CardTitle>
+        <CardTitle>邀请团队成员</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={inviteAction} className="space-y-4">
           <div>
             <Label htmlFor="email" className="mb-2">
-              Email
+              邮箱
             </Label>
             <Input
               id="email"
@@ -210,7 +225,7 @@ function InviteTeamMember() {
             />
           </div>
           <div>
-            <Label>Role</Label>
+            <Label>角色</Label>
             <RadioGroup
               defaultValue="member"
               name="role"
@@ -219,11 +234,11 @@ function InviteTeamMember() {
             >
               <div className="flex items-center space-x-2 mt-2">
                 <RadioGroupItem value="member" id="member" />
-                <Label htmlFor="member">Member</Label>
+                <Label htmlFor="member">成员</Label>
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <RadioGroupItem value="owner" id="owner" />
-                <Label htmlFor="owner">Owner</Label>
+                <Label htmlFor="owner">领导者</Label>
               </div>
             </RadioGroup>
           </div>
@@ -241,12 +256,12 @@ function InviteTeamMember() {
             {isInvitePending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Inviting...
+                邀请中...
               </>
             ) : (
               <>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Invite Member
+                邀请成员
               </>
             )}
           </Button>
@@ -255,7 +270,7 @@ function InviteTeamMember() {
       {!isOwner && (
         <CardFooter>
           <p className="text-sm text-muted-foreground">
-            You must be a team owner to invite new members.
+            只有团队领导者才能邀请
           </p>
         </CardFooter>
       )}
@@ -264,12 +279,46 @@ function InviteTeamMember() {
 }
 
 export default function SettingsPage() {
+  const [state, formAction, isPending] = useActionState<ActionState, FormData>(
+    updateAccount,
+    {}
+  );
+
   return (
     <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium mb-6">Team Settings</h1>
-      <Suspense fallback={<SubscriptionSkeleton />}>
-        <ManageSubscription />
-      </Suspense>
+      <h1 className="text-lg lg:text-2xl font-medium mb-6">个人信息</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>账号信息</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-4" action={formAction}>
+            <Suspense fallback={<AccountForm state={state} />}>
+              <AccountFormWithData state={state} />
+            </Suspense>
+            {state.error && (
+              <p className="text-red-500 text-sm">{state.error}</p>
+            )}
+            {state.success && (
+              <p className="text-green-500 text-sm">{state.success}</p>
+            )}
+            <Button
+              type="submit"
+              className="bg-orange-500 hover:bg-orange-600 text-white"
+              disabled={isPending}
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  保存中...
+                </>
+              ) : (
+                'Save Changes'
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
       <Suspense fallback={<TeamMembersSkeleton />}>
         <TeamMembers />
       </Suspense>
