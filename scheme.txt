@@ -1,0 +1,80 @@
+/
+├── app
+│   ├── (dashboard)
+│   │   ├── dashboard
+│   │   │   ├── activity
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── general
+│   │   │   │   └── page.tsx
+│   │   │   ├── security
+│   │   │   │   └── page.tsx
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   ├── pricing
+│   │   │   ├── page.tsx
+│   │   │   └── submit-button.tsx
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── terminal.tsx
+│   ├── (login)
+│   │   ├── sign-in
+│   │   │   └── page.tsx
+│   │   ├── sign-up
+│   │   │   └── page.tsx
+│   │   ├── actions.ts
+│   │   └── login.tsx
+│   ├── api
+│   │   ├── stripe
+│   │   │   ├── checkout
+│   │   │   │   └── route.ts
+│   │   │   └── webhook
+│   │   │       └── route.ts
+│   │   ├── team
+│   │   │   └── route.ts
+│   │   └── user
+│   │       └── route.ts
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── not-found.tsx
+├── components
+│   └── ui
+│       ├── avatar.tsx
+│       ├── button.tsx
+│       ├── card.tsx
+│       ├── dropdown-menu.tsx
+│       ├── input.tsx
+│       ├── label.tsx
+│       └── radio-group.tsx
+├── lib
+│   ├── auth
+│   │   ├── middleware.ts
+│   │   └── session.ts
+│   ├── db
+│   │   ├── migrations
+│   │   │   ├── meta
+│   │   │   │   ├── 0000_snapshot.json
+│   │   │   │   └── _journal.json
+│   │   │   └── 0000_soft_the_anarchist.sql
+│   │   ├── drizzle.ts
+│   │   ├── queries.ts
+│   │   ├── schema.ts
+│   │   ├── seed.ts
+│   │   └── setup.ts
+│   ├── payments
+│   │   ├── actions.ts
+│   │   └── stripe.ts
+│   └── utils.ts
+├── .env.example
+├── .gitignore
+├── LICENSE
+├── README.md
+├── components.json
+├── drizzle.config.ts
+├── middleware.ts
+├── next.config.ts
+├── package.json
+├── pnpm-lock.yaml
+├── postcss.config.mjs
+└── tsconfig.json
