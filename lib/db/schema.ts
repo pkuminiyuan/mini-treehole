@@ -1,3 +1,5 @@
+// @/lib/db/scheme.ts
+// 用于规范 database 表单结构
 import {
   pgTable,
   serial,
@@ -16,7 +18,7 @@ export const users = pgTable('users', {
   role: varchar('role', { length: 20 }).notNull().default('member'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-  deletedAt: timestamp('deleted_at'),
+  deletedAt: timestamp('deleted_at'), // 软删除
 });
 
 export const teams = pgTable('teams', {
@@ -24,11 +26,6 @@ export const teams = pgTable('teams', {
   name: varchar('name', { length: 100 }).notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-  stripeCustomerId: text('stripe_customer_id').unique(),
-  stripeSubscriptionId: text('stripe_subscription_id').unique(),
-  stripeProductId: text('stripe_product_id'),
-  planName: varchar('plan_name', { length: 50 }),
-  subscriptionStatus: varchar('subscription_status', { length: 20 }),
 });
 
 export const teamMembers = pgTable('team_members', {
@@ -112,8 +109,8 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
   }),
 }));
 
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect; // 选择
+export type NewUser = typeof users.$inferInsert; // 插入
 export type Team = typeof teams.$inferSelect;
 export type NewTeam = typeof teams.$inferInsert;
 export type TeamMember = typeof teamMembers.$inferSelect;

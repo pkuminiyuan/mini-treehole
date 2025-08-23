@@ -1,9 +1,15 @@
+// @/lib/auth/session.ts
+// 负责用户身份认证和会话管理
 import { compare, hash } from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import { NewUser } from '@/lib/db/schema';
 
-const key = new TextEncoder().encode(process.env.AUTH_SECRET);
+const AUTH_SECRET = process.env.AUTH_SECRET;
+if (!AUTH_SECRET) {
+  throw new Error('AUTH_SECRET environment variable is not set.');
+}
+const key = new TextEncoder().encode(AUTH_SECRET);
 const SALT_ROUNDS = 10;
 
 export async function hashPassword(password: string) {

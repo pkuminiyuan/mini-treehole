@@ -1,3 +1,5 @@
+// @/lib/db/seed.ts
+// 用于注入 database 原始数据的脚本
 import { db } from './drizzle';
 import { users, teams, teamMembers } from './schema';
 import { hashPassword } from '@/lib/auth/session';

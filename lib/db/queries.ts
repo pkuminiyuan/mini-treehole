@@ -1,9 +1,12 @@
+// @/lib/db/queries.ts
+// 负责与 database 进行交互
 import { desc, and, eq, isNull } from 'drizzle-orm';
 import { db } from './drizzle';
 import { activityLogs, teamMembers, teams, users } from './schema';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth/session';
 
+// 获取当前用户的个人信息
 export async function getUser() {
   const sessionCookie = (await cookies()).get('session');
   if (!sessionCookie || !sessionCookie.value) {
@@ -36,35 +39,8 @@ export async function getUser() {
   return user[0];
 }
 
-export async function getTeamByStripeCustomerId(customerId: string) {
-  const result = await db
-    .select()
-    .from(teams)
-    .where(eq(teams.stripeCustomerId, customerId))
-    .limit(1);
-
-  return result.length > 0 ? result[0] : null;
-}
-
-export async function updateTeamSubscription(
-  teamId: number,
-  subscriptionData: {
-    stripeSubscriptionId: string | null;
-    stripeProductId: string | null;
-    planName: string | null;
-    subscriptionStatus: string;
-  }
-) {
-  await db
-    .update(teams)
-    .set({
-      ...subscriptionData,
-      updatedAt: new Date()
-    })
-    .where(eq(teams.id, teamId));
-}
-
-export async function getUserWithTeam(userId: number) {
+// 获取询问用户所处团队 ID
+export async function getUserWithTeamID(userId: number) {
   const result = await db
     .select({
       user: users,
@@ -78,6 +54,7 @@ export async function getUserWithTeam(userId: number) {
   return result[0];
 }
 
+// 获取当前用户的活动日志
 export async function getActivityLogs() {
   const user = await getUser();
   if (!user) {
@@ -99,6 +76,7 @@ export async function getActivityLogs() {
     .limit(10);
 }
 
+// 获取当前用户的团队信息
 export async function getTeamForUser() {
   const user = await getUser();
   if (!user) {

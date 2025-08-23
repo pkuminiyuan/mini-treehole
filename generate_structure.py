@@ -3,7 +3,11 @@ from pathlib import Path
 
 def generate_tree_structure(root_dir, ignore_dirs=None, ignore_files=None):
     if ignore_dirs is None:
-        ignore_dirs = []
+        ignore_dirs = [
+            ".git",
+            ".next",
+            "node_modules",
+        ]
     if ignore_files is None:
         ignore_files = [
             "*.pyc",

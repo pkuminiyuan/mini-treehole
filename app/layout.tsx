@@ -1,16 +1,21 @@
+// @/app/layout.tsx
+// SaaS 的根布局文件
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 import { getUser, getTeamForUser } from '@/lib/db/queries';
 import { SWRConfig } from 'swr';
+import { ThemeProvider } from '@/components/theme-provider';
 
+// 元数据对象
 export const metadata: Metadata = {
-  title: 'miniyuan & mini-treehole',
+  title: 'mini-treehole',
   description: 'A simple trial for creating a mini-treehole'
 };
 
+// 视口配置对象
 export const viewport: Viewport = {
-  maximumScale: 1
+  maximumScale: 1 // 无法缩放
 };
 
 const manrope = Manrope({ subsets: ['latin'] });
@@ -22,22 +27,27 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
-      className={`bg-white dark:bg-gray-950 text-black dark:text-white ${manrope.className}`}
+      lang="en" className={manrope.className} suppressHydrationWarning
     >
-      <body className="min-h-[100dvh] bg-gray-50">
-        <SWRConfig
-          value={{
-            fallback: {
-              // We do NOT await here
-              // Only components that read this data will suspend
-              '/api/user': getUser(),
-              '/api/team': getTeamForUser()
-            }
-          }}
+      <body className="min-h-[100dvh]">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
         >
-          {children}
-        </SWRConfig>
+          <SWRConfig
+            value={{
+              fallback: {
+                // 传递 promise 给 fallback 对象，读取数据时才开始 await
+                '/api/user': getUser(),
+                '/api/team': getTeamForUser()
+              }
+            }}
+          >
+            {children}
+          </SWRConfig>
+        </ThemeProvider>
       </body>
     </html>
   );

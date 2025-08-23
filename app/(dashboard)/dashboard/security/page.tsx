@@ -35,7 +35,7 @@ export default function SecurityPage() {
 
   return (
     <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium bold text-gray-900 mb-6">
+      <h1 className="text-lg lg:text-2xl font-medium bold text-foreground mb-6">
         安全设置
       </h1>
       <Card className="mb-8">
@@ -120,7 +120,7 @@ export default function SecurityPage() {
           <CardTitle>删除账号</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             请注意，删除账号是不可恢复的！
           </p>
           <form action={deleteAction} className="space-y-4">

@@ -7,13 +7,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-12 lg:gap-8">
             <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-              <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
+              <h1 className="text-4xl font-bold text-foreground tracking-tight sm:text-5xl md:text-6xl">
                 MINI-TREEHOLE
                 <span className="block text-orange-500">留下你的痕迹</span>
               </h1>
             </div>
             <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-              <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
+              <p className="mt-3 text-base text-muted-foreground sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
                 今朝易逝不应误，
                 天道无情自茫茫。
                 星光黯淡叹流年，
@@ -29,7 +29,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white w-full">
+      <section className="py-16 bg-card w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-3 lg:gap-8">
             <div>
@@ -42,10 +42,10 @@ export default function HomePage() {
                 </svg>
               </div>
               <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
+                <h2 className="text-lg font-medium text-foreground">
                   Next.js & React
                 </h2>
-                <p className="mt-2 text-base text-gray-500">
+                <p className="mt-2 text-base text-muted-foreground">
                   前端搭建
                 </p>
               </div>
@@ -56,10 +56,10 @@ export default function HomePage() {
                 <Database className="h-6 w-6" />
               </div>
               <div className="mt-5">
-                <h2 className="text-lg font-medium text-gray-900">
+                <h2 className="text-lg font-medium text-foreground">
                   Postgres & Drizzle ORM
                 </h2>
-                <p className="mt-2 text-base text-gray-500">
+                <p className="mt-2 text-base text-muted-foreground">
                   后端搭建
                 </p>
               </div>

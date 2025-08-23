@@ -1,3 +1,5 @@
+// @/middleware.ts
+// 负责管理会话中间件
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { signToken, verifyToken } from '@/lib/auth/session';
@@ -9,12 +11,14 @@ export async function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get('session');
   const isProtectedRoute = pathname.startsWith(protectedRoutes);
 
+  // 保护路由
   if (isProtectedRoute && !sessionCookie) {
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
   let res = NextResponse.next();
 
+  // 刷新 cookie
   if (sessionCookie && request.method === 'GET') {
     try {
       const parsed = await verifyToken(sessionCookie.value);
