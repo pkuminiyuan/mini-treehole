@@ -9,22 +9,26 @@ import {
     PostWithAuthorAndStats,
 } from '@/lib/db/queries';
 
+
+interface RouteParamsContext {
+    params: Promise<{ id: string }>;
+}
+
 /**
  * 处理 GET 请求，获取指定 ID 的留言详情
  * @param request Next.js Request 对象
- * @param { params: { id: string } } context 包含动态路由参数 id
+ * @param context 包含动态路由参数 id
  * @returns 返回指定留言的详细信息。
  */
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    context: RouteParamsContext
 ) {
+    const postId = (await context.params).id;
+    if (!postId) {
+        return NextResponse.json({ error: 'postID 无效' }, { status: 400 });
+    }
     try {
-        const postId = params.id;
-        if (!postId) {
-            return NextResponse.json({ error: 'postID 无效' }, { status: 400 });
-        }
-
         const post: PostWithAuthorAndStats | null = await getPostById(postId);
 
         if (!post) {
@@ -33,7 +37,7 @@ export async function GET(
 
         return NextResponse.json(post);
     } catch (error) {
-        console.error(`Error fetching post ${params.id}:`, error);
+        console.error(`获取留言 ${postId} 失败:`, error);
         return NextResponse.json({ error: '获取留言失败' }, { status: 500 });
     }
 }
@@ -42,24 +46,24 @@ export async function GET(
  * 处理 PUT 请求，更新指定 ID 的留言
  * 只有登录且是留言作者的用户才能更新
  * @param request Next.js Request 对象
- * @param { params: { id: string } } context 包含动态路由参数 id
+ * @param context 包含动态路由参数 id
  * @returns 返回更新后的留言信息。
  */
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    context: RouteParamsContext
 ) {
+    const user = await getUser();
+    if (!user) {
+        return NextResponse.json({ error: '用户未认证' }, { status: 401 });
+    }
+
+    const postId = (await context.params).id;
+    if (!postId) {
+        return NextResponse.json({ error: 'postID 无效' }, { status: 400 });
+    }
+
     try {
-        const user = await getUser();
-        if (!user) {
-            return NextResponse.json({ error: '用户未认证' }, { status: 401 });
-        }
-
-        const postId = params.id;
-        if (!postId) {
-            return NextResponse.json({ error: 'postID 无效' }, { status: 400 });
-        }
-
         const { content, isAnonymous } = await request.json();
 
         // 简单的数据校验
@@ -87,7 +91,7 @@ export async function PUT(
 
         return NextResponse.json(updatedPost);
     } catch (error) {
-        console.error(`更新留言 ${params.id} 失败:`, error);
+        console.error(`更新留言 ${postId} 失败:`, error);
         return NextResponse.json({ error: '未找到留言' }, { status: 500 });
     }
 }
@@ -96,24 +100,24 @@ export async function PUT(
  * 处理 DELETE 请求，删除指定 ID 的留言。
  * 只有登录且是留言作者的用户才能删除。
  * @param request Next.js Request 对象
- * @param { params: { id: string } } context 包含动态路由参数 id
+ * @param context 包含动态路由参数 id
  * @returns 返回删除成功或失败消息。
  */
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    context: RouteParamsContext
 ) {
+    const user = await getUser();
+    if (!user) {
+        return NextResponse.json({ error: '用户未认证' }, { status: 401 });
+    }
+
+    const postId = (await context.params).id;
+    if (!postId) {
+        return NextResponse.json({ error: 'postID 无效' }, { status: 400 });
+    }
+
     try {
-        const user = await getUser();
-        if (!user) {
-            return NextResponse.json({ error: '用户未认证' }, { status: 401 });
-        }
-
-        const postId = params.id;
-        if (!postId) {
-            return NextResponse.json({ error: 'post ID 无效' }, { status: 400 });
-        }
-
         // 调用 deletePost，这里会通过 authorId 进行权限验证
         const success = await deletePost(postId, user.id);
 
@@ -129,7 +133,7 @@ export async function DELETE(
 
         return NextResponse.json({ message: '留言删除成功' });
     } catch (error) {
-        console.error(`删除留言 ${params.id} 失败:`, error);
+        console.error(`删除留言 ${postId} 失败:`, error);
         return NextResponse.json({ error: '留言删除失败' }, { status: 500 });
     }
 }

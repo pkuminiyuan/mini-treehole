@@ -43,3 +43,4 @@ postgres_data/
 # else
 generate_structure.py
 scheme.txt
+push-to-github.ts
