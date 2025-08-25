@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server';
 import { toggleBookmark, getUser } from '@/lib/db/queries';
 
+
 interface RouteParamsContext {
     params: Promise<{ id: string }>;
 }

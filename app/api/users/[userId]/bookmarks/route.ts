@@ -3,22 +3,27 @@
 import { NextResponse } from 'next/server';
 import { getBookmarkedPosts } from '@/lib/db/queries';
 
+
+interface RouteParamsContext {
+    params: Promise<{ userId: string }>;
+}
+
 /**
  * 处理 GET 请求，获取指定用户收藏的留言列表
  * @param request Next.js Request 对象
- * @param { params: { userId: string } } context 包含动态路由参数 userId
+ * @param context 包含动态路由参数 userId
  * @returns 返回收藏的留言列表
  */
 export async function GET(
     request: Request,
-    { params }: { params: { userId: string } }
+    context: RouteParamsContext
 ) {
-    try {
-        const targetUserId = params.userId;
-        if (!targetUserId) {
-            return NextResponse.json({ error: '用户 ID 无效' }, { status: 400 });
-        }
+    const targetUserId = (await context.params).userId;
+    if (!targetUserId) {
+        return NextResponse.json({ error: '用户 ID 无效' }, { status: 400 });
+    }
 
+    try {
         // 可选：如果希望只有用户自己能看自己的收藏，或者管理员能看，可以在这里加权限检查
         // const currentUserId = await getCurrentUserId();
         // if (!currentUserId || (currentUserId !== targetUserId && !isAdmin(currentUserId))) {
@@ -37,7 +42,7 @@ export async function GET(
 
         return NextResponse.json(bookmarkedPosts);
     } catch (error) {
-        console.error(`获取用户 ${params.userId} 收藏留言失败:`, error);
+        console.error(`获取用户 ${targetUserId} 收藏留言失败:`, error);
         return NextResponse.json({ error: '获取用户收藏留言失败' }, { status: 500 });
     }
 }
