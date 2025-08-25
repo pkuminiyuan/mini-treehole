@@ -9,20 +9,22 @@ import AuthCheckClient from '@/components/auth-check-client';
 import PaginationControls from '@/components/pagination-controls';
 
 interface SinglePostPageProps {
-    params: { id: string };
-    searchParams: { [key: string]: string | string[] | undefined };
+    params: Promise<{ id: string; }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function SinglePostPage({ params, searchParams }: SinglePostPageProps) {
-    const postId = params.id;
+    const resolvedParams = await params;
+    const postId = resolvedParams.id;
     if (!postId) {
         NotFound(); // ID 无效，返回 404
         return new Response('Invalid post ID', { status: 404 });
     }
 
     // 分页参数
-    const offset = parseInt(searchParams.offset as string || '0', 10);
-    const limit = parseInt(searchParams.limit as string || '10', 10);
+    const resolvedSearchParams = await searchParams;
+    const offset = parseInt(resolvedSearchParams.offset as string || '0', 10);
+    const limit = parseInt(resolvedSearchParams.limit as string || '10', 10);
 
     if (isNaN(offset) || isNaN(limit) || offset < 0 || limit <= 0) {
         // 处理非法分页参数
