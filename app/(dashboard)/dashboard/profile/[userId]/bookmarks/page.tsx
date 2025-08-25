@@ -6,19 +6,21 @@ import PaginationControls from '@/components/pagination-controls';
 import NotFound from '@/app/not-found';
 
 interface UserBookmarksPageProps {
-    params: { userId: string };
-    searchParams: { [key: string]: string | string[] | undefined };
+    params: Promise<{ userId: string; }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function UserBookmarksPage({ params, searchParams }: UserBookmarksPageProps) {
-    const userId = params.userId;
+    const resolvedParams = await params;
+    const userId = resolvedParams.userId;
     if (!userId) {
         NotFound(); // ID 无效，返回 404
         return new Response('Invalid post ID', { status: 404 });
     }
 
-    const offset = parseInt(searchParams.offset as string || '0', 10);
-    const limit = parseInt(searchParams.limit as string || '10', 10);
+    const resolvedSearchParams = await searchParams;
+    const offset = parseInt(resolvedSearchParams.offset as string || '0', 10);
+    const limit = parseInt(resolvedSearchParams.limit as string || '10', 10);
 
     let bookmarkedPostsData: PostsQueryResult = { posts: [], totalCount: 0 }; // 初始化
     try {
