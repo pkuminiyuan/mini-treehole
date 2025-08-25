@@ -10,11 +10,8 @@ import {
   likes,
   bookmarks,
   NewPost,
-  NewUser,
   User,
   Post,
-  Like,
-  Bookmark,
   SpecialUserId,
 } from './schema';
 import { cookies } from 'next/headers';
@@ -44,14 +41,11 @@ export async function getUser(): Promise<User | null> {
   if (
     !sessionData ||
     typeof sessionData.userId !== 'string' ||
-    typeof sessionData.userEmail !== 'string' // 你的 SessionPayload 现在要求 email 也是 string
+    typeof sessionData.userEmail !== 'string'
   ) {
     return null;
   }
 
-  // JWT exp 声明通常是秒级时间戳，Date 构造函数需要毫秒。需要乘以 1000。
-  // 此外，new Date() 会返回当前时间，sessionData.exp 是过期时间
-  // 如果当前时间晚于过期时间（new Date() > new Date(sessionData.exp * 1000)），则表示过期
   if (new Date() > new Date(sessionData.exp * 1000)) {
     // 清除过期 cookie
     cookieStore.set('session', '', { expires: new Date(0) });
@@ -152,7 +146,7 @@ export async function getTeamForUser() {
 }
 
 export type PostWithAuthorAndStats = Post & {
-  author: Pick<User, 'id' | 'name'> | null; // 作者可能是匿名或已删除用户，可以是null
+  author: Pick<User, 'id' | 'name'>;
   likeCount: number;
   isLikedByUser: boolean;
   isBookmarkedByUser: boolean;

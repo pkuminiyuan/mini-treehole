@@ -1,9 +1,9 @@
 // @/app/(dashboard)/layout.tsx
-// dashboard 共享布局
+// dashboard 共享布局，包含头部导航和用户菜单
 'use client';
 
 import Link from 'next/link';
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { CircleIcon, Home, LogOut } from 'lucide-react';
 import {
@@ -14,25 +14,36 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { signOut } from '@/app/(login)/actions';
-import { useRouter } from 'next/navigation';
-import { User } from '@/lib/db/schema';
-import useSWR, { mutate } from 'swr';
 import { ThemeToggle } from '@/components/themes/theme-toggle';
-import { fetcher } from '@/lib/utils/fetcher'
-
+import { AuthProvider, useAuth } from '@/components/auth-check-client';
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data: user } = useSWR<User>('/api/user', fetcher);
-  const router = useRouter();
+  // 从 useAuth 中只解构我们需要且稳定的状态
+  const { user, isInitialLoading } = useAuth();
+
+  useEffect(() => {
+    // 调试用途：观察 UserMenu 组件的 user 状态变化
+    console.log('UserMenu: useEffect 观察到 user 状态变化:', user, 'isInitialLoading:', isInitialLoading);
+  }, [user, isInitialLoading]);
 
   async function handleSignOut() {
+    console.log('UserMenu: handleSignOut 被触发');
+    // 调用服务器 Action，它将处理 session 删除、路径重新验证和重定向。
+    // 客户端的 JavaScript 执行流会在服务器响应重定向时中断。
     await signOut();
-    mutate('/api/user');
-    router.push('/');
+    console.log('UserMenu: signOut 已被调用，页面即将重定向...');
   }
 
+  // 只有在应用程序初次加载且用户状态未知 (undefined) 时显示加载动画
+  if (isInitialLoading && typeof user === 'undefined') {
+    console.log('UserMenu: 渲染中 - 初始加载 / 用户状态未知...');
+    return <div className="h-9 w-20 bg-gray-200 animate-pulse rounded-full"></div>;
+  }
+  
+  // 如果用户状态已知为未登录 (user 为 null)
   if (!user) {
+    console.log('UserMenu: 渲染中 - 用户未登录 (user is null)');
     return (
       <>
         <Button asChild className="rounded-full">
@@ -42,6 +53,8 @@ function UserMenu() {
     );
   }
 
+  // 如果用户状态已知为已登录 (user 为 User 对象)
+  console.log('UserMenu: 渲染中 - 用户已登录:', user.email);
   return (
     <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
       <DropdownMenuTrigger>
@@ -96,9 +109,11 @@ function Header() {
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <section className="flex flex-col min-h-screen">
-      <Header />
-      {children}
-    </section>
+    <AuthProvider>
+      <section className="flex flex-col min-h-screen">
+        <Header />
+        {children}
+      </section>
+    </AuthProvider>
   );
 }

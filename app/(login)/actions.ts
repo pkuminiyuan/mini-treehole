@@ -26,6 +26,8 @@ import {
   validatedAction,
   validatedActionWithUser
 } from '@/lib/auth/middleware';
+import { revalidatePath } from 'next/cache';
+
 
 async function logActivity(
   teamId: string | null | undefined,
@@ -212,9 +214,15 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 
 export async function signOut() {
   const user = (await getUser()) as User;
+  console.log('signOut: getUser 已执行');
   const userWithTeam = await getUserWithTeamID(user.id);
+  console.log('signOut: getUserWithTeamID 已执行');
   await logActivity(userWithTeam?.teamId, user.id, ActivityType.SIGN_OUT);
+  console.log('signOut: logActivity 已执行');
   (await cookies()).delete('session');
+  console.log('signOut: cookies delete 已执行');
+  revalidatePath('/');
+  redirect('/'); 
 }
 
 const updatePasswordSchema = z.object({
@@ -323,7 +331,7 @@ export const deleteAccount = validatedActionWithUser(
     }
 
     (await cookies()).delete('session');
-    redirect('/sign-in');
+    redirect('/');
   }
 );
 

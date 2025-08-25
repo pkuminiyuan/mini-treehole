@@ -17,7 +17,7 @@ export async function GET() {
     // 排除敏感信息（如 passwordHash）
     const { passwordHash, ...safeUser } = user;
     console.log('Successfully returned safe user data. User email:', safeUser.email);
-    return NextResponse.json(safeUser);
+    return NextResponse.json(safeUser, { status: 200 });
   } catch (error) {
     console.error('Failed to get user information. Returning 500. Error:', error);
     return NextResponse.json({ error: '获取用户信息失败' }, { status: 500 });
