@@ -5,7 +5,8 @@ import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 import { getUser, getTeamForUser } from '@/lib/db/queries';
 import { SWRConfig } from 'swr';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/components/themes/theme-provider';
+import { AuthProvider } from '@/components/auth-check-client';
 
 // 元数据对象
 export const metadata: Metadata = {
@@ -36,17 +37,20 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SWRConfig
-            value={{
-              fallback: {
-                // 传递 promise 给 fallback 对象，读取数据时才开始 await
-                '/api/user': getUser(),
-                '/api/team': getTeamForUser()
-              }
-            }}
-          >
-            {children}
-          </SWRConfig>
+          <AuthProvider>
+            <SWRConfig
+              value={{
+                fallback: {
+                  // 传递 promise 给 fallback 对象，读取数据时才开始 await
+                  '/api/user': getUser(),
+                  '/api/team': getTeamForUser()
+                }
+              }}
+            >
+              {children}
+            </SWRConfig>
+          </AuthProvider>
+
         </ThemeProvider>
       </body>
     </html>

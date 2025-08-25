@@ -1,4 +1,4 @@
-// components/theme-provider.tsx
+// components/themes/theme-provider.tsx
 // 负责管理主题状态
 'use client';
 

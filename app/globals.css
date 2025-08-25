@@ -7,6 +7,16 @@
 @variant dark (&:is(.dark *));
 
 @theme {
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-muted-primary: var(--brand-muted-primary);
+  --color-brand-accent-primary: var(--brand-accent-primary);
+  --color-brand-primary-foreground: var(--brand-primary-foreground);
+  --color-brand-red: var(--brand-red);
+  --color-brand-green: var(--brand-green);
+  --color-brand-destructive: var(--brand-destructive);
+  --color-brand-accent-destructive: var(--brand-accent-destructive);
+  --color-brand-destructive-foreground: var(--brand-destructive-foreground);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -21,9 +31,9 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
+  --color-border-foreground: var(--border-foreground);
+
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
@@ -75,6 +85,20 @@
 @layer base {
   /* 亮模式主题变量 */
   :root {
+    /* 统一品牌色 */
+    --brand-primary: hsl(20, 100%, 58%);
+    --brand-muted-primary: hsl(20, 91%, 91%);
+    --brand-accent-primary: hsl(20, 71%, 44%);
+    --brand-primary-foreground: hsl(0 0% 98%);
+    --brand-secondary: hsl(173 58% 39%);
+    --brand-muted-secondary: hsl(174, 91%, 91%);
+    --brand-accent-secondary: hsl(173, 72%, 21%);
+    --brand-red: hsl(0, 95%, 58%);
+    --brand-green: hsl(93, 95%, 58%);
+    --brand-destructive: hsl(0 84.2% 60.2%);
+    --brand-accent-destructive: hsl(0 62.8% 40%);
+    --brand-destructive-foreground: hsl(0 0% 98%);
+
     --background: hsl(0 0% 100%);
     --foreground: hsl(240 10% 3.9%);
     --card: hsl(0 0% 100%);
@@ -89,9 +113,8 @@
     --muted-foreground: hsl(240 3.8% 46.1%);
     --accent: hsl(240 4.8% 95.9%);
     --accent-foreground: hsl(240 5.9% 10%);
-    --destructive: hsl(0 84.2% 60.2%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(240 5.9% 90%);
+    --border: hsl(0, 0%, 93%);
+    --border-foreground: hsl(240 4.8% 95.9%);
     --input: hsl(240 5.9% 90%);
     --ring: hsl(240 10% 3.9%);
     --chart-1: hsl(12 76% 61%);
@@ -113,6 +136,7 @@
   }
 
   /* 暗模式主题变量 */
+  /* 会覆盖 root  */
 .dark {
   --background: hsl(240 5% 15%);
   --foreground: hsl(0 0% 95%);
@@ -128,9 +152,10 @@
   --muted-foreground: hsl(240 5% 70%);
   --accent: hsl(240 4% 22%);
   --accent-foreground: hsl(0 0% 95%);
-  --destructive: hsl(0 62.8% 40%);
-  --destructive-foreground: hsl(0 0% 95%);
-  --border: hsl(240 4% 25%);
+  --border: hsl(38, 10%, 38%);
+  --border-background: hsl(34, 31%, 70%);
+  --border-foreground: hsl(0 0% 95%);
+
   --input: hsl(240 4% 22%);
   --ring: hsl(240 5% 70%);
   

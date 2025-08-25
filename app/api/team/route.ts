@@ -1,3 +1,4 @@
+// @/app/api/team/route.ts
 import { getTeamForUser } from '@/lib/db/queries';
 
 export async function GET() {

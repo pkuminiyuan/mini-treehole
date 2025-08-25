@@ -120,7 +120,16 @@ async function main() {
     AUTH_SECRET,
   });
 
-  console.log('🎉 Setup completed successfully!');
+  console.log('\n🎉 Setup completed successfully!');
+  console.log('--------------------------------------------------------------------------');
+  console.log('Next steps:');
+  console.log('1. Generate database migrations: `pnpm db:generate`');
+  console.log('2. Apply database migrations:    `pnpm db:migrate`');
+  console.log('3. Apply RLS policies:           `pnpm db:apply-rls`');
+  console.log('4. Seed initial data (optional): `pnpm db:seed`');
+  console.log('5. Start your application:       `pnpm dev`');
+  console.log('--------------------------------------------------------------------------');
+  console.log('Remember to add `AUTH_SECRET` and `POSTGRES_URL` to your Vercel project environment variables for deployment.');
 }
 
 main().catch(console.error);

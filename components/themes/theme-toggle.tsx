@@ -1,4 +1,4 @@
-// components/theme-toggle.tsx
+// components/themes/theme-toggle.tsx
 // 主题切换按钮
 'use client';
 

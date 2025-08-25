@@ -89,14 +89,14 @@ export default function SecurityPage() {
               />
             </div>
             {passwordState.error && (
-              <p className="text-red-500 text-sm">{passwordState.error}</p>
+              <p className="text-brand-red text-sm">{passwordState.error}</p>
             )}
             {passwordState.success && (
-              <p className="text-green-500 text-sm">{passwordState.success}</p>
+              <p className="text-brand-green text-sm">{passwordState.success}</p>
             )}
             <Button
               type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white"
+              className="bg-brand-primary hover:bg-brand-accent-primary text-white"
               disabled={isPasswordPending}
             >
               {isPasswordPending ? (
@@ -107,7 +107,7 @@ export default function SecurityPage() {
               ) : (
                 <>
                   <Lock className="mr-2 h-4 w-4" />
-                  密码修改成功
+                  修改密码
                 </>
               )}
             </Button>
@@ -139,12 +139,12 @@ export default function SecurityPage() {
               />
             </div>
             {deleteState.error && (
-              <p className="text-red-500 text-sm">{deleteState.error}</p>
+              <p className="text-brand-red text-sm">{deleteState.error}</p>
             )}
             <Button
               type="submit"
               variant="destructive"
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-brand-destructive hover:bg-brand-accent-destructive"
               disabled={isDeletePending}
             >
               {isDeletePending ? (

@@ -9,20 +9,15 @@ export default function HomePage() {
             <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
               <h1 className="text-4xl font-bold text-foreground tracking-tight sm:text-5xl md:text-6xl">
                 MINI-TREEHOLE
-                <span className="block text-orange-500">留下你的痕迹</span>
+                <span className="block text-brand-primary">留下你的痕迹</span>
               </h1>
             </div>
             <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
               <p className="mt-3 text-base text-muted-foreground sm:mt-5 sm:text-xl lg:text-lg xl:text-xl">
-                今朝易逝不应误，
-                天道无情自茫茫。
-                星光黯淡叹流年，
-                期许未来莫虚度。
-                四方天地皆匆忙，
-                微光如梦已成霜。
-                我心自悔已迟暮，
-                五十年来万事荒，
-                十年一世恨绵长。
+                {"北曜文昌映紫穹，大鸾振翼驾东风。"}<br />
+                {"工成砥柱安寰宇，学就鸿猷拓碧空。"}<br />
+                {"人聚燕园酬壮志，才倾瀚海建奇功。"}<br />
+                {"辈承薪火千秋业，出岫云峰百代雄。"}
               </p>
             </div>
           </div>
@@ -33,7 +28,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-3 lg:gap-8">
             <div>
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-brand-primary text-white">
                 <svg viewBox="0 0 24 24" className="h-6 w-6">
                   <path
                     fill="currentColor"
@@ -52,7 +47,7 @@ export default function HomePage() {
             </div>
 
             <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-orange-500 text-white">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-brand-primary text-white">
                 <Database className="h-6 w-6" />
               </div>
               <div className="mt-5">

@@ -10,7 +10,7 @@ import {
   CardFooter
 } from '@/components/ui/card';
 import { useActionState } from 'react';
-import { TeamDataWithMembers, User } from '@/lib/db/schema';
+import { TeamDataWithMembers, TeamMember, TeamRole, User } from '@/lib/db/schema';
 import { updateAccount, removeTeamMember, inviteTeamMember } from '@/app/(login)/actions';
 import useSWR from 'swr';
 import { Suspense } from 'react';
@@ -18,9 +18,8 @@ import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Loader2, PlusCircle } from 'lucide-react';
+import { fetcher } from '@/lib/utils/fetcher';
 
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 type ActionState = {
   name?: string;
@@ -171,7 +170,7 @@ function TeamMembers() {
                     size="sm"
                     disabled={isRemovePending}
                   >
-                    {isRemovePending ? 'Removing...' : 'Remove'}
+                    {isRemovePending ? '移除中...' : '移除'}
                   </Button>
                 </form>
               ) : null}
@@ -197,8 +196,8 @@ function InviteTeamMemberSkeleton() {
 }
 
 function InviteTeamMember() {
-  const { data: user } = useSWR<User>('/api/user', fetcher);
-  const isOwner = user?.role === 'owner';
+  const { data: teamMember } = useSWR<TeamMember>('/api/team', fetcher);
+  const isOwner = teamMember?.role === TeamRole.OWNER;
   const [inviteState, inviteAction, isInvitePending] = useActionState<
     ActionState,
     FormData
@@ -250,7 +249,7 @@ function InviteTeamMember() {
           )}
           <Button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white"
+            className="bg-brand-primary hover:bg-brand-accent-primary text-white"
             disabled={isInvitePending || !isOwner}
           >
             {isInvitePending ? (
@@ -304,7 +303,7 @@ export default function SettingsPage() {
             )}
             <Button
               type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-forebackground"
+              variant="default"
               disabled={isPending}
             >
               {isPending ? (

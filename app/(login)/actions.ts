@@ -14,7 +14,9 @@ import {
   type NewTeamMember,
   type NewActivityLog,
   ActivityType,
-  invitations
+  invitations,
+  UserRole,
+  TeamRole,
 } from '@/lib/db/schema';
 import { comparePasswords, hashPassword, setSession } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
@@ -26,8 +28,8 @@ import {
 } from '@/lib/auth/middleware';
 
 async function logActivity(
-  teamId: number | null | undefined,
-  userId: number,
+  teamId: string | null | undefined,
+  userId: string,
   type: ActivityType,
   ipAddress?: string
 ) {
@@ -121,7 +123,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const newUser: NewUser = {
     email,
     passwordHash,
-    role: 'owner' // Default role, will be overridden if there's an invitation
+    role: UserRole.MEMBER
   };
 
   const [createdUser] = await db.insert(users).values(newUser).returning();
@@ -134,8 +136,8 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
     };
   }
 
-  let teamId: number;
-  let userRole: string;
+  let teamId: string;
+  let teamRole: TeamRole;
   let createdTeam: typeof teams.$inferSelect | null = null;
 
   if (inviteId) {
@@ -145,7 +147,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
       .from(invitations)
       .where(
         and(
-          eq(invitations.id, parseInt(inviteId)),
+          eq(invitations.id, inviteId),
           eq(invitations.email, email),
           eq(invitations.status, 'pending')
         )
@@ -154,7 +156,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 
     if (invitation) {
       teamId = invitation.teamId;
-      userRole = invitation.role;
+      teamRole = invitation.role;
 
       await db
         .update(invitations)
@@ -188,7 +190,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
     }
 
     teamId = createdTeam.id;
-    userRole = 'owner';
+    teamRole = TeamRole.OWNER;
 
     await logActivity(teamId, createdUser.id, ActivityType.CREATE_TEAM);
   }
@@ -196,7 +198,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
   const newTeamMember: NewTeamMember = {
     userId: createdUser.id,
     teamId: teamId,
-    role: userRole
+    role: teamRole
   };
 
   await Promise.all([
@@ -346,7 +348,7 @@ export const updateAccount = validatedActionWithUser(
 );
 
 const removeTeamMemberSchema = z.object({
-  memberId: z.number()
+  memberId: z.string()
 });
 
 export const removeTeamMember = validatedActionWithUser(
@@ -380,7 +382,7 @@ export const removeTeamMember = validatedActionWithUser(
 
 const inviteTeamMemberSchema = z.object({
   email: z.string().email('Invalid email address'),
-  role: z.enum(['member', 'owner'])
+  role: z.enum(Object.values(TeamRole) as [TeamRole, ...TeamRole[]])
 });
 
 export const inviteTeamMember = validatedActionWithUser(
@@ -406,7 +408,7 @@ export const inviteTeamMember = validatedActionWithUser(
       return { error: '用户已加入团队' };
     }
 
-    // Check if there's an existing invitation
+    // 检查是否存在邀请
     const existingInvitation = await db
       .select()
       .from(invitations)
@@ -423,7 +425,7 @@ export const inviteTeamMember = validatedActionWithUser(
       return { error: '当前邮箱已收到邀请' };
     }
 
-    // Create a new invitation
+    // 创建新邀请
     await db.insert(invitations).values({
       teamId: userWithTeam.teamId,
       email,

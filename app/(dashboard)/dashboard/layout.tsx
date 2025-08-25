@@ -16,7 +16,7 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: '/dashboard', icon: Users, label: '个人信息' },
-    { href: '/dashboard/general', icon: Settings, label: '核心功能' },
+    { href: '/dashboard/board', icon: Settings, label: '核心功能' },
     { href: '/dashboard/activity', icon: Activity, label: '活动日志' },
     { href: '/dashboard/security', icon: Shield, label: '安全设置' }
   ];

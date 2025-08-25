@@ -7,10 +7,12 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "db:clear": "npx tsx lib/db/clear.ts",
     "db:setup": "npx tsx lib/db/setup.ts",
     "db:seed": "npx tsx lib/db/seed.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:apply-rls": "npx tsx lib/db/rls/apply-policies.ts",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {

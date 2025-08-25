@@ -1,10 +1,5 @@
+// @/app/general/page.tsx
 'use client';
-
-import { useActionState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { User } from '@/lib/db/schema';
-import useSWR from 'swr';
 
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());

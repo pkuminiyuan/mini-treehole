@@ -3,7 +3,7 @@
 import { compare, hash } from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
-import { NewUser } from '@/lib/db/schema';
+import { UserRole } from '@/lib/db/schema';
 
 const AUTH_SECRET = process.env.AUTH_SECRET;
 if (!AUTH_SECRET) {
@@ -23,43 +23,82 @@ export async function comparePasswords(
   return compare(plainTextPassword, hashedPassword);
 }
 
-type SessionData = {
-  user: { id: number };
-  expires: string;
+// MODIFIED: 扩展 SessionPayload 类型，包含 userId, userEmail, userRole
+export type SessionPayload = {
+  userId: string;
+  userEmail: string;
+  userRole: UserRole;
+  // JOSE 会自动添加 'exp', 'iat', 'nbf' 等标准 JWT 声明
 };
 
-export async function signToken(payload: SessionData) {
+// signToken 接收扩展后的 SessionPayload，并返回 JWT 字符串
+export async function signToken(payload: SessionPayload) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('1 day from now')
+    .setExpirationTime('1 day from now') // 这里设置过期时间
     .sign(key);
 }
 
-export async function verifyToken(input: string) {
+// verifyToken 返回扩展后的 SessionPayload
+// 注意：jwtVerify 返回的 payload 会包含所有标准声明和我们自定义的声明
+export async function verifyToken(input: string): Promise<SessionPayload & {exp: number, iat: number}> {
   const { payload } = await jwtVerify(input, key, {
     algorithms: ['HS256'],
   });
-  return payload as SessionData;
+  // 类型断言
+  return payload as unknown as (SessionPayload & {exp: number, iat: number});
 }
 
-export async function getSession() {
-  const session = (await cookies()).get('session')?.value;
-  if (!session) return null;
-  return await verifyToken(session);
+// getSession 返回扩展后的 SessionPayload | null
+export async function getSession(): Promise<(SessionPayload & {exp: number, iat: number}) | null> {
+  const sessionCookie = (await cookies()).get('session')?.value;
+  if (!sessionCookie) return null;
+  try {
+    return await verifyToken(sessionCookie);
+  } catch (error) {
+    console.error('Failed to verify session token:', error);
+    (await cookies()).set('session', '', { expires: new Date(0) });
+    return null;
+  }
 }
 
-export async function setSession(user: NewUser) {
-  const expiresInOneDay = new Date(Date.now() + 24 * 60 * 60 * 1000);
-  const session: SessionData = {
-    user: { id: user.id! },
-    expires: expiresInOneDay.toISOString(),
-  };
-  const encryptedSession = await signToken(session);
+// 定义用于 setSession 的用户数据接口
+export interface AuthUserForSession {
+  id: string;
+  email: string;
+  role: UserRole;
+}
+
+// 接收 AuthUserForSession，并将其写入 JWT
+export async function setSession(user: AuthUserForSession) {
+  const encryptedSession = await signToken({
+    userId: user.id,
+    userEmail: user.email,
+    userRole: user.role,
+  });
   (await cookies()).set('session', encryptedSession, {
-    expires: expiresInOneDay,
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 设置 cookie 的过期时间
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
   });
+}
+
+// 为中间件和 auth-context 提供统一的用户会话详情
+export interface UserSessionDetails {
+  id: string;
+  email: string | null;
+  role: UserRole;
+}
+
+export function getUserSessionDetails(payload?: SessionPayload & {exp: number, iat: number}): UserSessionDetails | null {
+  if (!payload || !payload.userId) {
+    return null;
+  }
+  return {
+    id: payload.userId,
+    email: payload.userEmail,
+    role: payload.userRole,
+  };
 }

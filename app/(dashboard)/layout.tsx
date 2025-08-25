@@ -17,9 +17,9 @@ import { signOut } from '@/app/(login)/actions';
 import { useRouter } from 'next/navigation';
 import { User } from '@/lib/db/schema';
 import useSWR, { mutate } from 'swr';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ThemeToggle } from '@/components/themes/theme-toggle';
+import { fetcher } from '@/lib/utils/fetcher'
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,7 +36,7 @@ function UserMenu() {
     return (
       <>
         <Button asChild className="rounded-full">
-          <Link href="/sign-up">登录</Link>
+          <Link href="/sign-up" className='text-brand-primary-foreground'>登录</Link>
         </Button>
       </>
     );
@@ -49,7 +49,7 @@ function UserMenu() {
           <AvatarImage alt={user.name || ''} />
           <AvatarFallback>
             {user.email
-              .split(' ')
+              ?.split(' ')
               .map((n) => n[0])
               .join('')}
           </AvatarFallback>
@@ -80,7 +80,7 @@ function Header() {
     <header className="border-b border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center">
-          <CircleIcon className="h-6 w-6 text-orange-500" />
+          <CircleIcon className="h-6 w-6 text-brand-primary" />
           <span className="ml-2 text-xl font-semibold text-foreground">MINI-TREEHOLE</span>
         </Link>
         <div className="flex items-center space-x-4">
