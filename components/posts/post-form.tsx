@@ -3,6 +3,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { fetcher } from '@/lib/utils/fetcher';
 import { useAuth } from '../auth-check-client';
@@ -26,6 +27,7 @@ const PostForm: React.FC<PostFormProps> = ({
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -56,6 +58,7 @@ const PostForm: React.FC<PostFormProps> = ({
             setContent(''); // 清空表单
             setIsAnonymous(false);
             onPostCreated?.(newPost); // 调用回调函数
+            router.refresh(); // 发布后立即刷新
         } catch (err: any) {
             console.error('Failed to create post:', err);
             setError(err.message || '发布失败，请重试');

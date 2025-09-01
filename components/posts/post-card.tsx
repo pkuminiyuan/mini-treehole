@@ -21,18 +21,19 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({ post, onPostDeleted, onPostUpdated, showReplyButton = true, showParentLink = false }) => {
     const { user } = useAuth();
-    const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
     const [editedContent, setEditedContent] = useState(post.content);
     const [editedIsAnonymous, setEditedIsAnonymous] = useState(post.isAnonymous);
     const [isUpdating, setIsUpdating] = useState(false);
+    const router = useRouter();
 
     const handleDelete = async () => {
         if (!user || !user.id || !confirm('确定要删除这条留言吗？')) return;
 
         try {
             await fetcher(`/api/posts/${post.id}`, { method: 'DELETE' });
-            onPostDeleted?.(post.id); // 通知父组件更新列表
+            onPostDeleted?.(post.id);
+            router.refresh(); // 删除后立即刷新
         } catch (error) {
             console.error('删除留言失败:', error);
             alert('删除留言失败');
@@ -53,6 +54,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostDeleted, onPostUpdated,
             });
             onPostUpdated?.(updatedPost); // 通知父组件更新列表或特定帖子
             setIsEditing(false); // 退出编辑模式
+            router.refresh(); // 更新后立即刷新
         } catch (error) {
             console.error('更新留言失败:', error);
             alert('更新留言失败');
@@ -94,12 +96,14 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostDeleted, onPostUpdated,
                             >
                                 {isEditing ? '取消编辑' : '编辑'}
                             </button>
-                            <button
-                                onClick={handleDelete}
-                                className="text-red-500 hover:text-red-700 text-sm"
-                            >
-                                删除
-                            </button>
+                            {isEditing || (
+                                <button
+                                    onClick={handleDelete}
+                                    className="text-red-500 hover:text-red-700 text-sm"
+                                >
+                                    删除
+                                </button>
+                            )}
                         </div>
                     )}
                 </AuthCheckClient>
@@ -113,20 +117,20 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostDeleted, onPostUpdated,
                         className="w-full p-2 border rounded-md resize-y min-h-[80px]"
                         readOnly={isUpdating}
                     />
-                    <label className="flex items-center mt-2 text-sm text-gray-700">
-                        <input
-                            type="checkbox"
-                            checked={editedIsAnonymous}
-                            onChange={(e) => setEditedIsAnonymous(e.target.checked)}
-                            className="mr-2"
-                            disabled={isUpdating}
-                        />
-                        匿名发布
-                    </label>
-                    <div className="flex justify-end mt-2 space-x-2">
+                    <div className="flex items-center justify-between mt-3">
+                        <label className="flex items-center text-foreground">
+                            <input
+                                type="checkbox"
+                                checked={editedIsAnonymous}
+                                onChange={(e) => setEditedIsAnonymous(e.target.checked)}
+                                className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border rounded"
+                                disabled={isUpdating}
+                            />
+                            匿名发布
+                        </label>
                         <button
                             onClick={handleUpdate}
-                            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+                            className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
                             disabled={isUpdating}
                         >
                             {isUpdating ? '更新中...' : '保存修改'}
