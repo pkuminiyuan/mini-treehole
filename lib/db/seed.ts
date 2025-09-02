@@ -20,7 +20,7 @@ async function seed() {
   // --- 1. 创建特殊用户 ---
   // 这些用户ID是硬编码的，需要在数据库中事先存在以满足外键约束
   // 使用 onConflictDoNothing() 确保幂等性
-  const passwordHashForAdmin = await hashPassword('pkuminiyuan');
+  const passwordHashForAdmin = 'pkuminiyuan' // await hashPassword('pkuminiyuan');
   const passwordHashForSpecialUsers = await hashPassword('specialpassword');
 
   await db

@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             console.log('AuthProvider: Fetching user session from /api/user...');
             const response = await fetch('/api/user');
-            
+
             if (response.ok) {
                 const userData: User = await response.json();
                 console.log('AuthProvider: 成功获取用户数据:', userData?.email);
@@ -100,14 +100,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     fetchUser();
                 }, 300); // 300ms 的防抖延迟
             } else { // 用户状态为 undefined (例如，刚从 sign-out 重定向回来，需要快速确定状态)
-                 console.log(`AuthProvider: User state undefined, triggering immediate fetch for ${pathname}.`);
-                 fetchUser(); // 立即触发，不延迟
+                console.log(`AuthProvider: User state undefined, triggering immediate fetch for ${pathname}.`);
+                fetchUser(); // 立即触发，不延迟
             }
         }
-        
+
         // Cleanup 函数，在组件卸载或 effect 重新运行时清除定时器
         return () => {
-             if (fetchTimerRef.current) {
+            if (fetchTimerRef.current) {
                 clearTimeout(fetchTimerRef.current);
             }
         };

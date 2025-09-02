@@ -143,7 +143,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostDeleted, onPostUpdated,
 
                 {/* 右侧：编辑和删除按钮 */}
                 <AuthCheckClient loggedInOnly>
-                    {user && user.id === post.author?.id && (
+                    {user && (user.id === post.author?.id || user.role === 'admin') && (
                         <div className="flex space-x-2 items-baseline">
                             <button
                                 onClick={() => setIsEditing(!isEditing)}
