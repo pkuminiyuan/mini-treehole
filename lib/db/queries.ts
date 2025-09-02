@@ -1,6 +1,6 @@
 // @/lib/db/queries.ts
 // 负责与 database 进行交互
-import { desc, and, eq, sql, isNull, count } from 'drizzle-orm';
+import { desc, and, eq, sql, isNull } from 'drizzle-orm';
 import { db } from './drizzle';
 import {
   users,
@@ -171,17 +171,19 @@ export function createPostBaseQuery(userId: string) {
       author: {
         id: users.id,
         name: users.name,
-        deleteAt: users.deletedAt,
+        deletedAt: users.deletedAt,
       },
       likeCount: sql<number>`count(DISTINCT ${likes.id})`.mapWith(Number).as('likeCount'),
       isLikedByUser: sql<boolean>`CASE WHEN count(DISTINCT CASE WHEN ${likes.userId} = ${userId} THEN ${likes.id} ELSE null END) > 0 THEN TRUE ELSE FALSE END`.as('isLikedByUser'),
       isBookmarkedByUser: sql<boolean>`CASE WHEN count(DISTINCT CASE WHEN ${bookmarks.userId} = ${userId} THEN ${bookmarks.id} ELSE null END) > 0 THEN TRUE ELSE FALSE END`.as('isBookmarkedByUser'),
-      repliesCount: sql<number>`(SELECT COUNT(*) FROM ${posts} WHERE ${posts.parentId} = ${posts.id})`.mapWith(Number).as('repliesCount'),
+      repliesCount: sql<number>`(
+        SELECT COUNT(*) FROM posts AS p2 WHERE p2.parent_id = posts.id
+      )`.mapWith(Number).as('repliesCount'),
     })
     .from(posts)
-    .leftJoin(users, eq(posts.authorId, users.id)) // 关联作者信息
-    .leftJoin(likes, eq(likes.postId, posts.id)) // 关联所有点赞
-    .leftJoin(bookmarks, eq(bookmarks.postId, posts.id)); // 关联所有收藏
+    .leftJoin(users, eq(posts.authorId, users.id))
+    .leftJoin(likes, eq(likes.postId, posts.id))
+    .leftJoin(bookmarks, eq(bookmarks.postId, posts.id));
 }
 
 // 有关收藏的查询器
@@ -192,23 +194,25 @@ export function createBookmarkBaseQuery(userId: string) {
       author: {
         id: users.id,
         name: users.name,
-        deleteAt: users.deletedAt,
+        deletedAt: users.deletedAt,
       },
       likeCount: sql<number>`count(DISTINCT ${likes.id})`.mapWith(Number).as('likeCount'),
       isLikedByUser: sql<boolean>`CASE WHEN count(DISTINCT CASE WHEN ${likes.userId} = ${userId} THEN ${likes.id} ELSE null END) > 0 THEN TRUE ELSE FALSE END`.as('isLikedByUser'),
-      isBookmarkedByUser: sql<boolean>`TRUE`.as('isBookmarkedByUser'), // 必为 true，因为是从收藏表中查询
-      repliesCount: sql<number>`(SELECT COUNT(*) FROM ${posts} AS p_replies WHERE p_replies.${posts.parentId} = ${posts.id})`.mapWith(Number).as('repliesCount'),
+      isBookmarkedByUser: sql<boolean>`TRUE`.as('isBookmarkedByUser'),
+      repliesCount: sql<number>`(
+        SELECT COUNT(*) FROM posts AS p2 WHERE p2.parent_id = posts.id
+      )`.mapWith(Number).as('repliesCount'),
     })
     .from(bookmarks)
-    .innerJoin(posts, eq(bookmarks.postId, posts.id)) // 必须是innerJoin，因为只看收藏
-    .leftJoin(users, eq(posts.authorId, users.id)) // 关联作者信息
-    .leftJoin(likes, eq(likes.postId, posts.id)) // 关联所有点赞
+    .innerJoin(posts, eq(bookmarks.postId, posts.id))
+    .leftJoin(users, eq(posts.authorId, users.id))
+    .leftJoin(likes, eq(likes.postId, posts.id));
 }
 
 // 原始数据类型
 export type RawPostResult = {
   post: Post;
-  author: { id: string; name: string | null; deleteAt: Date | null } | null;
+  author: { id: string; name: string | null; deletedAt: Date | null } | null;
   likeCount: number;
   isLikedByUser: boolean;
   isBookmarkedByUser: boolean;
@@ -228,11 +232,11 @@ export function formatPost(rawPost: RawPostResult): PostWithAuthorAndStats {
       return { id: SpecialUserId.ANONYMOUS_USER_ID, name: '匿名用户' };
     }
 
-    if (!rawPost.author.deleteAt) {
+    if (!rawPost.author.deletedAt) {
       return { id: rawPost.author.id, name: rawPost.author.name };
     }
 
-    if (rawPost.author.deleteAt) {
+    if (rawPost.author.deletedAt) {
       return { id: SpecialUserId.DELETED_USER_ID, name: '消失的用户' };
     }
 

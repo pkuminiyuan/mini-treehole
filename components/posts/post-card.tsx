@@ -83,30 +83,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostDeleted, onPostUpdated,
                     </p>
                     {showParentLink && post.parentId && (
                         <div className="text-xs text-gray-500 mb-2">
-                            回复了 <Link href={`/board/${post.parentId}`} className="text-blue-500 hover:underline">原始留言</Link>
+                            回复了 <Link href={`/dashboard/board/${post.parentId}`} className="text-blue-500 hover:underline">原始留言</Link>
                         </div>
                     )}
                 </div>
-                <AuthCheckClient loggedInOnly>
-                    {user && user.id === post.author?.id && (
-                        <div className="flex space-x-2">
-                            <button
-                                onClick={() => setIsEditing(!isEditing)}
-                                className="text-blue-500 hover:text-blue-700 text-sm"
-                            >
-                                {isEditing ? '取消编辑' : '编辑'}
-                            </button>
-                            {isEditing || (
-                                <button
-                                    onClick={handleDelete}
-                                    className="text-red-500 hover:text-red-700 text-sm"
-                                >
-                                    删除
-                                </button>
-                            )}
-                        </div>
-                    )}
-                </AuthCheckClient>
             </div>
 
             {isEditing ? (
@@ -141,22 +121,47 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostDeleted, onPostUpdated,
                 <p className="mt-2 text-foreground whitespace-pre-wrap">{post.content}</p>
             )}
 
-            <div className="flex items-center space-x-4 mt-4 text-sm text-gray-600">
-                <LikeButton
-                    postId={post.id}
-                    initialLikeCount={post.likeCount}
-                    initialIsLikedByUser={post.isLikedByUser}
-                />
-                <BookmarkButton
-                    postId={post.id}
-                    initialIsBookmarkedByUser={post.isBookmarkedByUser}
-                />
-                {showReplyButton && (
-                    <Link href={`/board/${post.id}`} className="text-blue-500 hover:underline flex items-center space-x-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                        <span>{post.repliesCount} 回复</span>
-                    </Link>
-                )}
+            <div className="flex items-center justify-between space-x-4 mt-4 text-sm text-gray-600">
+                {/* 左侧：点赞、收藏、回复 */}
+                <div className="flex items-center space-x-4">
+                    <LikeButton
+                        postId={post.id}
+                        initialLikeCount={post.likeCount}
+                        initialIsLikedByUser={post.isLikedByUser}
+                    />
+                    <BookmarkButton
+                        postId={post.id}
+                        initialIsBookmarkedByUser={post.isBookmarkedByUser}
+                    />
+                    {showReplyButton && (
+                        <Link href={`/dashboard/board/${post.id}`} className="text-blue-500 hover:underline flex items-center space-x-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                            <span>{post.repliesCount} 回复</span>
+                        </Link>
+                    )}
+                </div>
+
+                {/* 右侧：编辑和删除按钮 */}
+                <AuthCheckClient loggedInOnly>
+                    {user && user.id === post.author?.id && (
+                        <div className="flex space-x-2 items-baseline">
+                            <button
+                                onClick={() => setIsEditing(!isEditing)}
+                                className="text-blue-500 hover:text-blue-700 hover:cursor-pointer text-sm"
+                            >
+                                {isEditing ? '取消编辑' : '编辑'}
+                            </button>
+                            {isEditing || (
+                                <button
+                                    onClick={handleDelete}
+                                    className="text-red-500 hover:text-red-700 hover:cursor-pointer text-sm"
+                                >
+                                    删除
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </AuthCheckClient>
             </div>
         </div>
     );

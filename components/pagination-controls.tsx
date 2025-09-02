@@ -16,11 +16,11 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
     currentPage,
     perPage,
     baseUrl,
+    totalItems,
 }) => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // 假设我们不知道 totalItems，只提供 Prev/Next
     const handlePageChange = (direction: 'prev' | 'next') => {
         let newOffset;
         if (direction === 'prev') {
@@ -37,25 +37,24 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
     };
 
     const hasPrev = currentPage > 1;
-    // 如果有 totalItems，可以计算 hasNext
-    // const hasNext = (currentPage * perPage) < totalItems;
+    const hasNext = (currentPage * perPage) < totalItems;
 
     return (
         <div className="flex justify-between items-center mt-6">
             <button
                 onClick={() => handlePageChange('prev')}
                 disabled={!hasPrev}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-brand-primary text-brand-primary-foreground rounded-md hover:bg-brand-accent-primary hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                上一页
+                {hasPrev ? '上一页' : '已是最前页'}
             </button>
-            <span className="text-gray-700">第 {currentPage} 页</span>
+            <span className="text-muted-foreground">第 {currentPage} 页</span>
             <button
                 onClick={() => handlePageChange('next')}
-                // 简单起见，假设总是有下一页，直到 API 返回空数组
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!hasNext}
+                className="px-4 py-2 bg-brand-primary text-brand-primary-foreground rounded-md hover:bg-brand-accent-primary hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                下一页
+                {hasNext ? '下一页' : '已是最后页'}
             </button>
         </div>
     );

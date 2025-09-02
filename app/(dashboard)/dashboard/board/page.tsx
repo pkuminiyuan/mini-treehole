@@ -65,7 +65,7 @@ export default async function BoardPage({ searchParams }: BoardPageProps) {
             <PaginationControls
                 currentPage={currentPage}
                 perPage={limit}
-                baseUrl="/board"
+                baseUrl="/dashboard/board"
                 totalItems={totalCount}
             />
         </section>

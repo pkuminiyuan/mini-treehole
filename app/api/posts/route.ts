@@ -53,7 +53,7 @@ export async function POST(request: Request) {
         if (typeof isAnonymous !== 'boolean') {
             return NextResponse.json({ error: 'isAnonymous 变量有误' }, { status: 400 });
         }
-        if (parentId && typeof parentId !== 'number') {
+        if (parentId && typeof parentId !== 'string') {
             return NextResponse.json({ error: 'parentId 变量有误' }, { status: 400 });
         }
 

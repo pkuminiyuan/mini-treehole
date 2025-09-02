@@ -65,18 +65,29 @@ export async function middleware(request: NextRequest) {
   }
 
   // --- 3. RLS 会话上下文设置 (基于已验证的会话 payload) ---
-  let userContext: CurrentUserContext = { id: null, email: null, role: null };
-
   if (sessionPayload) {
-    userContext = getUserSessionDetails(sessionPayload)!;
-  }
-  
-  // 调用 applyRlsSessionContext 设置数据库会话变量
-  try {
-    await applyRlsSessionContext(userContext);
-    console.log(`Middleware: RLS context applied for user ${userContext.id || 'N/A'}`);
-  } catch (error) {
-    console.error('Middleware: Failed to apply RLS session context:', error);
+    try {
+      const userContext = getUserSessionDetails(sessionPayload);
+      if (userContext) {
+        await applyRlsSessionContext(userContext);
+        console.log(`Middleware: RLS context applied for user ${userContext.id}`);
+      } else {
+        console.log('Middleware: No user context available for RLS');
+        // 对于已认证但无法获取用户上下文的情况，设置空的 RLS 上下文
+        await applyRlsSessionContext({ id: null, email: null, role: null });
+      }
+    } catch (error) {
+      console.error('Middleware: Failed to apply RLS session context:', error);
+      // 即使 RLS 设置失败，也继续处理请求，但记录错误
+    }
+  } else {
+    // 用户未登录，设置空的 RLS 上下文
+    try {
+      await applyRlsSessionContext({ id: null, email: null, role: null });
+      console.log('Middleware: RLS context cleared (no session)');
+    } catch (error) {
+      console.error('Middleware: Failed to clear RLS session context:', error);
+    }
   }
 
   return res;
