@@ -1,5 +1,16 @@
 // @/app/(dashboard)/dashboard/profile/[userId]/page.tsx
-// 个人主页页面：Server Component，根据 userId 获取并展示用户信息（使用自定义 fetcher）
+// 个人主页页面：Client Component，根据 userId 获取并展示用户信息
+'use client';
+
+import React from 'react';
+import { useParams } from 'next/navigation';
+import NotFound from '@/app/not-found';
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+} from '@/components/ui/card';
 import {
     User,
     Mail,
@@ -8,17 +19,10 @@ import {
     Shield,
     Activity,
     CheckCircle,
-    Badge,
 } from 'lucide-react';
-import React from 'react';
-import NotFound from '@/app/not-found';
-import {
-    Card,
-    CardHeader,
-    CardTitle,
-    CardContent,
-} from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import LoadingSpinner from '@/components/loading-spinner';
+import useSWR from 'swr';
 import { fetcher } from '@/lib/utils/fetcher';
 
 interface User {
@@ -34,32 +38,56 @@ interface UserData {
     teamId: string | null;
 }
 
-interface ProfilePageProps {
-    params: Promise<{ userId: string }>;
-}
-
 /**
+ * 个人主页 Client Component
+ */
+export default function ProfilePage() {
+    // 使用 useParams hook 获取参数
+    const params = useParams();
+    const userId = params.userId as string;
 
-个人主页 Server Component
-@param params.userId 用户ID
-*/
-export default async function ProfilePage({ params }: ProfilePageProps) {
-    const { userId } = await params;
-    const baseUrl = process.env.BASE_URL;
+    // 使用 useSWR 获取数据
+    const { data, error, isLoading } = useSWR<UserData>(
+        `/api/users/${userId}`, 
+        fetcher
+    );
 
-    let data: UserData;
-    try {
-        data = await fetcher<UserData>(`${baseUrl}/api/users/${userId}`, { cache: 'no-store', });
-    } catch (error: any) {
-        // 如果接口返回 404，fetcher 会抛错，捕获并渲染 404 页面
-        if (error.message && error.message.includes('404')) {
-            NotFound();
+    // 处理加载状态
+    if (isLoading) {
+        return (
+            <section className="flex-1 p-4 lg:p-8">
+                <LoadingSpinner />
+            </section>
+        );
+    }
+
+    // 处理错误状态
+    if (error) {
+        if (error.message.includes('404')) {
+            return <NotFound />;
         }
-        // 其他错误继续抛出
-        throw new Error(error.message || '获取用户信息失败');
+        return (
+            <section className="flex-1 p-4 lg:p-8">
+                <div className="text-center py-8">
+                    <div className="text-red-500 mb-4">加载失败: {error.message}</div>
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                    >
+                        重试
+                    </button>
+                </div>
+            </section>
+        );
+    }
+
+    // 处理数据不存在的情况
+    if (!data) {
+        return <NotFound />;
     }
 
     const { user, teamId } = data;
+
     return (
         <section className="flex-1 p-4 lg:p-8">
             {/* 页面标题 */}
