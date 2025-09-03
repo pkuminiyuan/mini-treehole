@@ -72,7 +72,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostDeleted, onPostUpdated,
                         {post.isAnonymous ? (
                             <span className="font-semibold">匿名用户</span>
                         ) : (
-                            <Link href={`/profile/${post.author?.id}`} className="font-semibold text-blue-500 hover:underline">
+                            <Link href={`/dashboard/profile/${post.author?.id}`} className="font-semibold text-blue-500 hover:underline">
                                 {post.author?.name || '不留芳名'}
                             </Link>
                         )}{' '}

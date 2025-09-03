@@ -91,8 +91,8 @@ export default async function ActivityPage() {
 
                 return (
                   <li key={log.id} className="flex items-center space-x-4">
-                    <div className="bg-brand-muted-primary rounded-full p-2">
-                      <Icon className="w-5 h-5 text-brand-primary" />
+                    <div className="bg-brand-bright-first rounded-full p-2">
+                      <Icon className="w-5 h-5 text-brand-first" />
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-foreground">
@@ -109,7 +109,7 @@ export default async function ActivityPage() {
             </ul>
           ) : (
             <div className="flex flex-col items-center justify-center text-center py-12">
-              <AlertCircle className="h-12 w-12 text-brand-primary mb-4" />
+              <AlertCircle className="h-12 w-12 text-brand-first mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 暂无
               </h3>

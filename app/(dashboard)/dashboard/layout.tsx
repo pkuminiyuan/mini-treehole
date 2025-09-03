@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Users, Settings, Shield, Activity, Menu } from 'lucide-react';
+import { Users, Settings, MessageCircle, Activity, Menu } from 'lucide-react';
 
 export default function DashboardLayout({
   children
@@ -16,26 +16,26 @@ export default function DashboardLayout({
 
   const navItems = [
     { href: '/dashboard', icon: Users, label: '个人信息' },
-    { href: '/dashboard/board', icon: Settings, label: '核心功能' },
+    { href: '/dashboard/board', icon: MessageCircle, label: '留言板' },
     { href: '/dashboard/activity', icon: Activity, label: '活动日志' },
-    { href: '/dashboard/security', icon: Shield, label: '安全设置' }
+    { href: '/dashboard/security', icon: Settings, label: '安全设置' }
   ];
 
   return (
     <div className="flex flex-col min-h-[calc(100dvh-68px)] max-w-7xl mx-auto w-full">
       {/* Mobile header */}
-      <div className="lg:hidden flex items-center justify-between bg-background border-b border p-4">
-        <div className="flex items-center">
-          <span className="font-medium">侧边栏</span>
+      <div className="lg:hidden flex items-right bg-background border-b border p-4">
+        <div className="ml-auto flex items-center">
+          <span className="font-medium mr-4">侧边栏</span>
+          <Button
+            className="-mr-3"
+            variant="ghost"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            <Menu className="h-6 w-6" />
+            <span className="sr-only">Toggle sidebar</span>
+          </Button>
         </div>
-        <Button
-          className="-mr-3"
-          variant="ghost"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        >
-          <Menu className="h-6 w-6" />
-          <span className="sr-only">Toggle sidebar</span>
-        </Button>
       </div>
 
       <div className="flex flex-1 overflow-hidden h-full">
@@ -49,8 +49,8 @@ export default function DashboardLayout({
               <Link key={item.href} href={item.href} passHref>
                 <Button
                   variant={pathname === item.href ? 'secondary' : 'ghost'}
-                  className={`shadow-none my-1 w-full justify-start ${pathname === item.href ? 'background' : ''
-                    }`}
+                  className={`shadow-none my-1 w-full justify-start ${pathname === item.href ? 'background' : ''} 
+                  ${pathname === item.href ? '' : 'cursor-pointer'}`}
                   onClick={() => setIsSidebarOpen(false)}
                 >
                   <item.icon className="h-4 w-4" />

@@ -249,7 +249,7 @@ function InviteTeamMember() {
           )}
           <Button
             type="submit"
-            className="bg-brand-primary hover:bg-brand-accent-primary text-white"
+            className="bg-brand-first hover:bg-brand-accent-first text-white"
             disabled={isInvitePending || !isOwner}
           >
             {isInvitePending ? (
@@ -285,7 +285,7 @@ export default function SettingsPage() {
 
   return (
     <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium mb-6">个人信息</h1>
+      <h1 className="text-lg lg:text-2xl font-medium foreground mb-6">个人信息</h1>
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>账号信息</CardTitle>

@@ -44,7 +44,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
             <button
                 onClick={() => handlePageChange('prev')}
                 disabled={!hasPrev}
-                className="px-4 py-2 bg-brand-primary text-brand-primary-foreground rounded-md hover:bg-brand-accent-primary hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-brand-first text-brand-first-foreground rounded-md hover:bg-brand-accent-first hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {hasPrev ? '上一页' : '已是最前页'}
             </button>
@@ -52,7 +52,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
             <button
                 onClick={() => handlePageChange('next')}
                 disabled={!hasNext}
-                className="px-4 py-2 bg-brand-primary text-brand-primary-foreground rounded-md hover:bg-brand-accent-primary hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-brand-first text-brand-first-foreground rounded-md hover:bg-brand-accent-first hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {hasNext ? '下一页' : '已是最后页'}
             </button>

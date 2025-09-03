@@ -9,7 +9,7 @@ export default function HomePage() {
             <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
               <h1 className="text-4xl font-bold text-foreground tracking-tight sm:text-5xl md:text-6xl">
                 MINI-TREEHOLE
-                <span className="block text-brand-primary">留下你的痕迹</span>
+                <span className="block text-brand-first">留下你的痕迹</span>
               </h1>
             </div>
             <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
@@ -28,7 +28,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:grid lg:grid-cols-3 lg:gap-8">
             <div>
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-brand-primary text-white">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-brand-first text-white">
                 <svg viewBox="0 0 24 24" className="h-6 w-6">
                   <path
                     fill="currentColor"
@@ -47,7 +47,7 @@ export default function HomePage() {
             </div>
 
             <div className="mt-10 lg:mt-0">
-              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-brand-primary text-white">
+              <div className="flex items-center justify-center h-12 w-12 rounded-md bg-brand-first text-white">
                 <Database className="h-6 w-6" />
               </div>
               <div className="mt-5">

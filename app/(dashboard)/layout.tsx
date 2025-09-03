@@ -19,7 +19,6 @@ import { AuthProvider, useAuth } from '@/components/auth-check-client';
 
 function UserMenu() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // 从 useAuth 中只解构我们需要且稳定的状态
   const { user, isInitialLoading } = useAuth();
 
   useEffect(() => {
@@ -40,14 +39,14 @@ function UserMenu() {
     console.log('UserMenu: 渲染中 - 初始加载 / 用户状态未知...');
     return <div className="h-9 w-20 bg-gray-200 animate-pulse rounded-full"></div>;
   }
-  
+
   // 如果用户状态已知为未登录 (user 为 null)
   if (!user) {
     console.log('UserMenu: 渲染中 - 用户未登录 (user is null)');
     return (
       <>
         <Button asChild className="rounded-full">
-          <Link href="/sign-up" className='text-brand-primary-foreground'>登录</Link>
+          <Link href="/sign-up" className='text-brand-first-foreground'>登录</Link>
         </Button>
       </>
     );
@@ -69,7 +68,7 @@ function UserMenu() {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="flex flex-col gap-1">
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer" onClick={() => setIsMenuOpen(false)}>
           <Link href="/dashboard" className="flex w-full items-center">
             <Home className="mr-2 h-4 w-4" />
             <span>控制面板</span>
@@ -77,7 +76,7 @@ function UserMenu() {
         </DropdownMenuItem>
         <form action={handleSignOut} className="w-full">
           <button type="submit" className="flex w-full">
-            <DropdownMenuItem className="w-full flex-1 cursor-pointer">
+            <DropdownMenuItem className="w-full flex-1 cursor-pointer" onClick={() => setIsMenuOpen(false)}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>退出</span>
             </DropdownMenuItem>
@@ -93,7 +92,7 @@ function Header() {
     <header className="border-b border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center">
-          <CircleIcon className="h-6 w-6 text-brand-primary" />
+          <CircleIcon className="h-6 w-6 text-brand-first" />
           <span className="ml-2 text-xl font-semibold text-foreground">MINI-TREEHOLE</span>
         </Link>
         <div className="flex items-center space-x-4">

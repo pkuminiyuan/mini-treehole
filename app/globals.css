@@ -7,10 +7,31 @@
 @variant dark (&:is(.dark *));
 
 @theme {
-  --color-brand-primary: var(--brand-primary);
-  --color-brand-muted-primary: var(--brand-muted-primary);
-  --color-brand-accent-primary: var(--brand-accent-primary);
-  --color-brand-primary-foreground: var(--brand-primary-foreground);
+  --color-brand-first: var(--brand-first);
+  --color-brand-muted-first: var(--brand-muted-first);
+  --color-brand-accent-first: var(--brand-accent-first);
+  --color-brand-bright-first: var(--brand-bright-first);
+  --color-brand-dark-first: var(--brand-dark-first);
+  --color-brand-first-foreground: var(--brand-first-foreground);
+
+  --color-brand-second: var(--brand-second);
+  --color-brand-muted-second: var(--brand-muted-second);
+  --color-brand-accent-second: var(--brand-accent-second);
+  --color-brand-bright-second: var(--brand-bright-second);
+  --color-brand-dark-second: var(--brand-dark-second);
+
+  --color-brand-third: var(--brand-third);
+  --color-brand-muted-third: var(--brand-muted-third);
+  --color-brand-accent-third: var(--brand-accent-third);
+  --color-brand-bright-third: var(--brand-bright-third);
+  --color-brand-dark-third: var(--brand-dark-third);
+
+  --color-brand-fourth: var(--brand-fourth);
+  --color-brand-muted-fourth: var(--brand-muted-fourth);
+  --color-brand-accent-fourth: var(--brand-accent-fourth);
+  --color-brand-bright-fourth: var(--brand-bright-fourth);
+  --color-brand-dark-fourth: var(--brand-dark-fourth);
+
   --color-brand-red: var(--brand-red);
   --color-brand-green: var(--brand-green);
   --color-brand-destructive: var(--brand-destructive);
@@ -19,14 +40,17 @@
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --color-card: var(--card);
+  --color-accent-card: var(--accent-card);
   --color-card-foreground: var(--card-foreground);
+  
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
+  --color-first: var(--first);
+  --color-first-foreground: var(--first-foreground);
+  --color-second: var(--second);
+  --color-second-foreground: var(--second-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -45,8 +69,8 @@
   /* 侧边栏主题变量 */
   --color-sidebar: var(--sidebar-background);
   --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-first: var(--sidebar-first);
+  --color-sidebar-first-foreground: var(--sidebar-first-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
@@ -85,14 +109,31 @@
 @layer base {
   /* 亮模式主题变量 */
   :root {
-    /* 统一品牌色 */
-    --brand-primary: hsl(20, 100%, 58%);
-    --brand-muted-primary: hsl(20, 91%, 91%);
-    --brand-accent-primary: hsl(20, 71%, 44%);
-    --brand-primary-foreground: hsl(0 0% 98%);
-    --brand-secondary: hsl(173 58% 39%);
-    --brand-muted-secondary: hsl(174, 91%, 91%);
-    --brand-accent-secondary: hsl(173, 72%, 21%);
+    --brand-first: hsl(20, 100%, 58%);
+    --brand-muted-first: hsl(20, 100%, 95%);
+    --brand-accent-first: hsl(20, 71%, 44%);
+    --brand-bright-first: hsl(20, 100%, 99%);
+    --brand-dark-first: hsl(20, 71%, 44%);
+    --brand-first-foreground: hsl(0 0% 98%);
+
+    --brand-second: hsl(230, 100%, 58%);
+    --brand-muted-second: hsl(230, 100%, 95%);
+    --brand-accent-second: hsl(230, 100%, 44%);
+    --brand-bright-second: hsl(230, 100%, 99%);
+    --brand-dark-second: hsl(230, 71%, 44%);
+
+    --brand-third: hsl(80 100% 58%);
+    --brand-muted-third: hsl(80, 100%, 95%);
+    --brand-accent-third: hsl(80, 100%, 44%);
+    --brand-bright-third: hsl(80, 100%, 99%);
+    --brand-dark-third: hsl(80, 71%, 44%);
+
+    --brand-fourth: hsl(270 100% 58%);
+    --brand-muted-fourth: hsl(270, 100%, 95%);
+    --brand-accent-fourth: hsl(270, 100%, 44%);
+    --brand-bright-fourth: hsl(270, 100%, 99%);
+    --brand-dark-fourth: hsl(270, 71%, 44%);
+
     --brand-red: hsl(0, 95%, 58%);
     --brand-green: hsl(93, 95%, 58%);
     --brand-destructive: hsl(0 84.2% 60.2%);
@@ -101,14 +142,17 @@
 
     --background: hsl(0 0% 100%);
     --foreground: hsl(240 10% 3.9%);
+
     --card: hsl(0 0% 100%);
+    --accent-card: hsla(0, 4%, 95%, 0.5);
     --card-foreground: hsl(240 10% 3.9%);
+
     --popover: hsl(0 0% 100%);
     --popover-foreground: hsl(240 10% 3.9%);
-    --primary: hsl(240 5.9% 10%);
-    --primary-foreground: hsl(0 0% 98%);
-    --secondary: hsl(240 4.8% 95.9%);
-    --secondary-foreground: hsl(240 5.9% 10%);
+    --first: hsl(240 5.9% 10%);
+    --first-foreground: hsl(0 0% 98%);
+    --second: hsl(240 4.8% 95.9%);
+    --second-foreground: hsl(240 5.9% 10%);
     --muted: hsl(240 4.8% 95.9%);
     --muted-foreground: hsl(240 3.8% 46.1%);
     --accent: hsl(240 4.8% 95.9%);
@@ -127,8 +171,8 @@
     /* 侧边栏主题变量 */
     --sidebar-background: hsl(0 0% 98%);
     --sidebar-foreground: hsl(240 5.3% 26.1%);
-    --sidebar-primary: hsl(240 5.9% 10%);
-    --sidebar-primary-foreground: hsl(0 0% 98%);
+    --sidebar-first: hsl(240 5.9% 10%);
+    --sidebar-first-foreground: hsl(0 0% 98%);
     --sidebar-accent: hsl(240 4.8% 95.9%);
     --sidebar-accent-foreground: hsl(240 5.9% 10%);
     --sidebar-border: hsl(220 13% 91%);
@@ -138,16 +182,42 @@
   /* 暗模式主题变量 */
   /* 会覆盖 root  */
 .dark {
+  --brand-muted-first: hsl(20, 8%, 24%);
+  --brand-accent-first: hsl(20, 100%, 97%);
+  --brand-bright-first: hsl(20, 100%, 97%);
+  --brand-dark-first: hsl(20, 71%, 44%);
+
+  --brand-second: hsl(230, 70%, 65%);
+  --brand-muted-second: hsl(230, 8%, 24%);
+  --brand-accent-second: hsl(230, 100%, 97%);
+  --brand-bright-second: hsl(230, 100%, 97%);
+  --brand-dark-second: hsl(230, 8%, 24%);
+
+  --brand-third: hsl(100, 70%, 65%);
+  --brand-muted-third: hsl(100, 8%, 24%);
+  --brand-accent-third: hsl(100, 100%, 97%);
+  --brand-bright-third: hsl(100, 100%, 97%);
+  --brand-dark-third: hsl(100, 8%, 24%);
+
+  --brand-fourth: hsl(270, 70%, 65%);
+  --brand-muted-fourth: hsl(270, 8%, 24%);
+  --brand-accent-fourth: hsl(270, 100%, 97%);
+  --brand-bright-fourth: hsl(270, 100%, 97%);
+  --brand-dark-fourth: hsl(270, 8%, 24%);
+
   --background: hsl(240 5% 15%);
   --foreground: hsl(0 0% 95%);
+
   --card: hsl(240 5% 18%);
+  --accent-card: hsl(240, 5%, 20%);
   --card-foreground: hsl(0 0% 95%);
+
   --popover: hsl(240 5% 18%);
   --popover-foreground: hsl(0 0% 95%);
-  --primary: hsl(0 0% 95%);
-  --primary-foreground: hsl(240 5% 15%);
-  --secondary: hsl(240 4% 22%);
-  --secondary-foreground: hsl(0 0% 95%);
+  --first: hsl(0 0% 95%);
+  --first-foreground: hsl(240 5% 15%);
+  --second: hsl(240 4% 22%);
+  --second-foreground: hsl(0 0% 95%);
   --muted: hsl(240 4% 22%);
   --muted-foreground: hsl(240 5% 70%);
   --accent: hsl(240 4% 22%);
@@ -162,8 +232,8 @@
   /* 侧边栏主题变量 */
   --sidebar-background: hsl(240 5% 18%);
   --sidebar-foreground: hsl(240 5% 85%);
-  --sidebar-primary: hsl(217 91% 60%);
-  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-first: hsl(217 91% 60%);
+  --sidebar-first-foreground: hsl(0 0% 100%);
   --sidebar-accent: hsl(240 4% 22%);
   --sidebar-accent-foreground: hsl(240 5% 85%);
   --sidebar-border: hsl(240 4% 25%);
