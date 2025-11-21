@@ -34,6 +34,7 @@ export enum TeamRole {
 // 用户表
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
+  supabaseId: text('supabase_id').unique(),
   name: varchar('name', { length: 100 }),
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),

@@ -1,5 +1,4 @@
 // @/lib/db/seed.ts
-// 用于注入 database 原始数据的脚本
 import { db } from './drizzle';
 import {
   users,
@@ -13,22 +12,82 @@ import {
   TeamRole,
 } from './schema';
 import { hashPassword } from '@/lib/auth/session';
+import { createClient } from '@supabase/supabase-js';
+
+// --- Supabase Admin Client Creation for Seed Script ---
+function createSupabaseAdminClientForSeed() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable.');
+  }
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable.');
+  }
+
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+}
+// --- end Supabase Admin Client Creation for Seed Script ---
 
 async function seed() {
   console.log('--- Starting seed process ---');
 
-  // --- 1. 创建特殊用户 ---
-  // 这些用户ID是硬编码的，需要在数据库中事先存在以满足外键约束
-  // 使用 onConflictDoNothing() 确保幂等性
-  const passwordHashForAdmin = await hashPassword('pkuminiyuan');
+  const supabase = createSupabaseAdminClientForSeed();
+
+  const passwordForAdmin = 'pkuminiyuan';
+  const passwordHashForAdmin = await hashPassword(passwordForAdmin);
   const passwordHashForSpecialUsers = await hashPassword('specialpassword');
+
+  // --- 处理可登录的管理员用户 (miniyuan) ---
+  let miniyuanSupabaseId: string | undefined;
+  try {
+    // 尝试查找现有用户
+    const { data: { users: existingAuthUsers }, error: listUsersError } = await supabase.auth.admin.listUsers();
+    
+    if (listUsersError) {
+      console.error('Error listing existing users for miniyuan:', listUsersError.message);
+      throw listUsersError;
+    }
+
+    const existingMiniyuan = existingAuthUsers?.find(u => u.email === 'miniyuan@example.com');
+
+    if (existingMiniyuan) {
+      miniyuanSupabaseId = existingMiniyuan.id;
+      console.log(`miniyuan (admin) already existed in Supabase Auth with ID: ${miniyuanSupabaseId}`);
+    } else {
+      // 用户不存在，创建新用户
+      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+        email: 'miniyuan@example.com',
+        password: passwordForAdmin,
+        email_confirm: true, // 关键：标记邮箱已验证，绕过验证流程
+        user_metadata: { // 使用 user_metadata 来存储额外信息
+          name: 'miniyuan',
+          role: UserRole.ADMIN,
+        },
+      });
+
+      if (createError) {
+        console.error('Error creating miniyuan in Supabase Auth:', createError.message);
+        throw createError;
+      }
+      if (newUser?.user) { // createUser 的 data.user 才是用户对象
+        miniyuanSupabaseId = newUser.user.id;
+        console.log(`miniyuan (admin) created in Supabase Auth with ID: ${miniyuanSupabaseId}`);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to create or get miniyuan Supabase Auth user:', error);
+    process.exit(1);
+  }
 
   await db
     .insert(users)
     .values([
       {
         id: SpecialUserId.SYSTEM_USER_ID,
-        email: 'pku@example.com', // 区分于普通用户的邮箱，用于系统内部操作或管理员
+        supabaseId: miniyuanSupabaseId,
+        email: 'miniyuan@example.com',
         name: 'miniyuan',
         passwordHash: passwordHashForAdmin,
         role: UserRole.ADMIN,
@@ -37,6 +96,7 @@ async function seed() {
       },
       {
         id: SpecialUserId.ANONYMOUS_USER_ID,
+        supabaseId: null,
         email: "anonymous@example.com",
         name: 'Anonymous User',
         passwordHash: passwordHashForSpecialUsers,
@@ -46,6 +106,7 @@ async function seed() {
       },
       {
         id: SpecialUserId.DELETED_USER_ID,
+        supabaseId: null,
         email: "deleted@example.com",
         name: 'Deleted User',
         passwordHash: passwordHashForSpecialUsers,
@@ -55,6 +116,7 @@ async function seed() {
       },
       {
         id: SpecialUserId.MYSTERIOUS_USER_ID,
+        supabaseId: null,
         email: "mysterious@example.com",
         name: 'Mysterious User',
         passwordHash: passwordHashForSpecialUsers,
@@ -63,19 +125,60 @@ async function seed() {
         updatedAt: new Date(),
       },
     ])
-    .onConflictDoNothing({ target: users.id }); // 如果ID已存在则不冲突，即不插入
-  console.log('Special users ensured to exist.');
+    .onConflictDoNothing({ target: users.id });
+  console.log('Special users ensured to exist in Drizzle.');
 
-  // --- 2. 创建一个测试用户 ---
-  const passwordHash = await hashPassword('test123');
+  const testUserEmail = 'test@example.com';
+  const testUserPassword = 'test123';
+  const passwordHash = await hashPassword(testUserPassword);
+  let testUserSupabaseId: string | undefined;
+
+  try {
+    // 尝试查找现有用户
+    const { data: { users: existingAuthUsers }, error: listUsersError } = await supabase.auth.admin.listUsers();
+
+    if (listUsersError) {
+      console.error('Error listing existing users for test user:', listUsersError.message);
+      throw listUsersError;
+    }
+    const existingTestUser = existingAuthUsers?.find(u => u.email === testUserEmail);
+
+    if (existingTestUser) {
+      testUserSupabaseId = existingTestUser.id;
+      console.log(`Test user already existed in Supabase Auth with ID: ${testUserSupabaseId}`);
+    } else {
+      // 用户不存在，创建新用户
+      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+        email: testUserEmail,
+        password: testUserPassword,
+        email_confirm: true,
+        user_metadata: {
+          name: 'Test User',
+          role: UserRole.MEMBER,
+        },
+      });
+
+      if (createError) {
+        console.error('Error creating Test User in Supabase Auth:', createError.message);
+        throw createError;
+      }
+      if (newUser?.user) {
+        testUserSupabaseId = newUser.user.id;
+        console.log(`Test user created in Supabase Auth with ID: ${testUserSupabaseId}`);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to create or get Test User Supabase Auth user:', error);
+    process.exit(1);
+  }
 
   const [testUser] = await db
     .insert(users)
     .values([
       {
-        // 允许 defaultRandom() 生成一个真实的 UUID
+        supabaseId: testUserSupabaseId,
         name: 'Test User',
-        email: 'test@test.com',
+        email: testUserEmail,
         passwordHash: passwordHash,
         role: UserRole.MEMBER,
         createdAt: new Date(),
@@ -83,23 +186,30 @@ async function seed() {
       },
     ])
     .onConflictDoUpdate({
-      target: users.email, // 如果email冲突，则更新
+      target: users.email,
       set: {
         name: 'Test User',
+        supabaseId: testUserSupabaseId,
         passwordHash: passwordHash,
         role: UserRole.MEMBER,
         updatedAt: new Date(),
       },
     })
-    .returning(); // 返回新创建或更新的用户
+    .returning();
 
-  console.log(`Test user '${testUser.email}' created/updated with ID: ${testUser.id}.`);
+  console.log(`Test user '${testUser.email}' created/updated with ID: ${testUser.id} in Drizzle.`);
 
-  // --- 3. 创建一个测试团队 ---
+  const systemUserInDrizzle = await db.query.users.findFirst({
+    where: (users, { eq }) => eq(users.id, SpecialUserId.SYSTEM_USER_ID),
+  });
+  if (!systemUserInDrizzle) {
+    console.error('System user not found in Drizzle, this should not happen!');
+    process.exit(1);
+  }
+
   const [testTeam] = await db
     .insert(teams)
     .values({
-      // 允许 defaultRandom() 生成一个真实的 UUID
       name: 'Test Team',
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -108,7 +218,6 @@ async function seed() {
 
   console.log(`Test team '${testTeam.name}' created/updated with ID: ${testTeam.id}.`);
 
-  // --- 4. 添加测试用户到测试团队 ---
   await db.insert(teamMembers)
     .values({
       userId: testUser.id,
@@ -122,9 +231,8 @@ async function seed() {
     });
   console.log(`Test user added to '${testTeam.name}' as owner.`);
 
-  // --- 5. 创建一些留言 ---
   const [post1] = await db.insert(posts).values({
-    authorId: SpecialUserId.SYSTEM_USER_ID,
+    authorId: systemUserInDrizzle.id,
     content: 'Hello World! This is miniyuan.',
     isAnonymous: false,
     createdAt: new Date(),
@@ -151,7 +259,6 @@ async function seed() {
   }).returning();
   console.log(`Post ID: ${post3.id} created as a reply to Post 1.`);
 
-  // --- 6. 创建点赞 ---
   await db.insert(likes).values([
     {
       userId: testUser.id,
@@ -160,20 +267,19 @@ async function seed() {
     },
     {
       userId: testUser.id,
-      postId: post2.id, // 用户可以点赞匿名帖子
+      postId: post2.id,
       createdAt: new Date(),
     },
-  ]).onConflictDoNothing({ target: [likes.userId, likes.postId] }); // 避免重复点赞
+  ]).onConflictDoNothing({ target: [likes.userId, likes.postId] });
   console.log(`${testUser.name} liked posts ${post1.id} and ${post2.id}.`);
 
-  // --- 7. 创建收藏 ---
   await db.insert(bookmarks).values([
     {
       userId: testUser.id,
       postId: post1.id,
       createdAt: new Date(),
     },
-  ]).onConflictDoNothing({ target: [bookmarks.userId, bookmarks.postId] }); // 避免重复收藏
+  ]).onConflictDoNothing({ target: [bookmarks.userId, bookmarks.postId] });
   console.log(`${testUser.name} bookmarked post ${post1.id}.`);
 
   console.log('--- Seed process finished successfully ---');

@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
-import { Login } from '../login';
+import { LogUnit } from '../log-unit';
 
 export default function SignUpPage() {
   return (
     <Suspense>
-      <Login mode="signup" />
+      <LogUnit mode="signup" />
     </Suspense>
   );
 }

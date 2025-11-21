@@ -6,7 +6,6 @@ import { promisify } from 'node:util';
 import readline from 'node:readline';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import os from 'node:os';
 
 const execAsync = promisify(exec);
 
@@ -33,12 +32,13 @@ async function getPostgresURL(): Promise<string> {
   if (dbChoice.toLowerCase() === 'l') {
     console.log('Setting up local Postgres instance with Docker...');
     await setupLocalPostgres();
-    return 'postgres://postgres:postgres@localhost:54322/postgres';
+    return 'postgres://postgres:postgres@localhost:54322/postgres'; // 本地 Docker 数据库 URL
   } else {
     console.log(
       'You can find Postgres databases at: https://vercel.com/marketplace?category=databases'
     );
-    return await question('Enter your POSTGRES_URL: ');
+    // 即使是远程数据库，也提示用户输入，用户应该输入Supabase的连接字符串
+    return await question('Enter your POSTGRES_URL (e.g., your Supabase connection string): ');
   }
 }
 
@@ -99,8 +99,26 @@ function generateAuthSecret(): string {
   return crypto.randomBytes(32).toString('hex');
 }
 
+async function getSupabaseEnvVars(): Promise<Record<string, string>> {
+  console.log('\nStep 3: Setting up Supabase (required for authentication)');
+  console.log('Please go to your Supabase project dashboard:');
+  console.log('  - Project URL: Settings -> API -> Project URL');
+  console.log('  - Anon Key:    Settings -> API -> Project API keys -> anon public');
+  console.log('  - Service Role Key: Settings -> API -> Project API keys -> service_role');
+
+  const supabaseUrl = await question('Enter your NEXT_PUBLIC_SUPABASE_URL: ');
+  const supabaseAnonKey = await question('Enter your NEXT_PUBLIC_SUPABASE_ANON_KEY: ');
+  const supabaseServiceRoleKey = await question('Enter your SUPABASE_SERVICE_ROLE_KEY: ');
+
+  return {
+    NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseAnonKey,
+    SUPABASE_SERVICE_ROLE_KEY: supabaseServiceRoleKey,
+  };
+}
+
 async function writeEnvFile(envVars: Record<string, string>) {
-  console.log('Step 6: Writing environment variables to .env');
+  console.log('Step 6: Writing environment variables to .env'); // 更新步骤号
   const envContent = Object.entries(envVars)
     .map(([key, value]) => `${key}=${value}`)
     .join('\n');
@@ -110,14 +128,16 @@ async function writeEnvFile(envVars: Record<string, string>) {
 }
 
 async function main() {
-  const POSTGRES_URL = await getPostgresURL();
-  const BASE_URL = 'http://localhost:3000';
-  const AUTH_SECRET = generateAuthSecret();
+  const POSTGRES_URL = await getPostgresURL(); // Step 2
+  const supabaseEnvVars = await getSupabaseEnvVars(); // Step 3
+  const BASE_URL = 'http://localhost:3000'; // Step 4
+  const AUTH_SECRET = generateAuthSecret(); // Step 5
 
   await writeEnvFile({
     POSTGRES_URL,
     BASE_URL,
     AUTH_SECRET,
+    ...supabaseEnvVars,
   });
 
   console.log('\n🎉 Setup completed successfully!');
@@ -129,7 +149,12 @@ async function main() {
   console.log('4. Seed initial data (optional): `pnpm db:seed`');
   console.log('5. Start your application:       `pnpm dev`');
   console.log('--------------------------------------------------------------------------');
-  console.log('Remember to add `AUTH_SECRET` and `POSTGRES_URL` to your Vercel project environment variables for deployment.');
+  console.log('Remember to add these variables to your Vercel project environment variables for deployment:');
+  console.log('- POSTGRES_URL');
+  console.log('- AUTH_SECRET');
+  console.log('- NEXT_PUBLIC_SUPABASE_URL');
+  console.log('- NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  console.log('- SUPABASE_SERVICE_ROLE_KEY');
 }
 
 main().catch(console.error);

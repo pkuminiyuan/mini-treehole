@@ -61,6 +61,7 @@ CREATE TABLE "teams" (
 --> statement-breakpoint
 CREATE TABLE "users" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"supabase_id" text,
 	"name" varchar(100),
 	"email" varchar(255) NOT NULL,
 	"password_hash" text NOT NULL,
@@ -68,6 +69,7 @@ CREATE TABLE "users" (
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"deleted_at" timestamp,
+	CONSTRAINT "users_supabase_id_unique" UNIQUE("supabase_id"),
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
