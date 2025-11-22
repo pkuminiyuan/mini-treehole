@@ -56,7 +56,7 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
 
     return (
         <button onClick={handleBookmark} className={buttonClass} disabled={isLoading || !user}>
-            {variant === 'icon' ? (
+            {variant === 'icon' && (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5 fill-current"
@@ -69,7 +69,7 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-                            fill="currentColor"
+                            fill="#FFEB3B"
                         />
                     ) : (
                         <path
@@ -79,9 +79,8 @@ const BookmarkButton: React.FC<BookmarkButtonProps> = ({
                         />
                     )}
                 </svg>
-            ) : (
-                <span>{isBookmarked ? '已收藏' : '收藏'}</span>
             )}
+            <span>{isBookmarked ? '已收藏' : '收藏'}</span>
         </button>
     );
 };

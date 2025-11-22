@@ -151,10 +151,7 @@ export type PostWithAuthorAndStats = Post & {
   isLikedByUser: boolean;
   isBookmarkedByUser: boolean;
   repliesCount: number; // 回复数量
-  // 可选：添加 parentPost 字段，用于获取回复的父留言信息 (如果你需要显示“回复XXX”的功能)
-  // parentPost?: Pick<Post, 'id' | 'content' | 'isAnonymous'> & {
-  //   author: Pick<User, 'id' | 'name'> | null;
-  // };
+  isOwnedByCurrentUser?: boolean; // 表示当前请求者是否为该帖子作者（仅用于前端判断）
 };
 
 // 返回数据和总数的类型
@@ -220,28 +217,35 @@ export type RawPostResult = {
 };
 
 // 格式化函数与批量格式化函数
-export function formatPost(rawPost: RawPostResult): PostWithAuthorAndStats {
+export function formatPost(rawPost: RawPostResult, currentUserId?: string | null): PostWithAuthorAndStats {
   const { post, likeCount, isLikedByUser, isBookmarkedByUser, repliesCount } = rawPost;
 
-  const getAuthorInfo = (rawPost: RawPostResult) => {
-    if (!rawPost.author) {
+  const isOwnedByCurrentUser = Boolean(currentUserId && currentUserId === post.authorId);
+
+  const getAuthorInfo = (raw: RawPostResult) => {
+    // 没有 author（极端情况）
+    if (!raw.author) {
       return { id: SpecialUserId.MYSTERIOUS_USER_ID, name: '神秘用户' };
     }
 
-    if (rawPost.post.isAnonymous) {
-      return { id: SpecialUserId.ANONYMOUS_USER_ID, name: '匿名用户' };
-    }
-
-    if (!rawPost.author.deletedAt) {
-      return { id: rawPost.author.id, name: rawPost.author.name };
-    }
-
-    if (rawPost.author.deletedAt) {
+    // 若作者被删除
+    if (raw.author.deletedAt) {
       return { id: SpecialUserId.DELETED_USER_ID, name: '消失的用户' };
     }
 
-    return { id: SpecialUserId.MYSTERIOUS_USER_ID, name: '神秘用户' };
-  }
+    // 如果帖子为匿名
+    if (raw.post.isAnonymous) {
+      // 对作者本人展示真实信息（伪匿名：作者可见）
+      if (isOwnedByCurrentUser) {
+        return { id: raw.author.id, name: raw.author.name };
+      }
+      // 否则为普通访客展示“匿名用户”
+      return { id: SpecialUserId.ANONYMOUS_USER_ID, name: '匿名用户' };
+    }
+
+    // 普通非匿名帖子且作者未被删除
+    return { id: raw.author.id, name: raw.author.name };
+  };
 
   return {
     ...post,
@@ -250,10 +254,12 @@ export function formatPost(rawPost: RawPostResult): PostWithAuthorAndStats {
     isLikedByUser,
     isBookmarkedByUser,
     repliesCount,
+    isOwnedByCurrentUser,
   };
 }
-export function formatPosts(rawPosts: RawPostResult[]): PostWithAuthorAndStats[] {
-  return rawPosts.map(formatPost);
+
+export function formatPosts(rawPosts: RawPostResult[], currentUserId?: string | null): PostWithAuthorAndStats[] {
+  return rawPosts.map(r => formatPost(r, currentUserId));
 }
 
 /**
@@ -282,7 +288,7 @@ export async function getTopLevelPosts(
     .offset(offset)
     .limit(limit);
 
-  const formattedPosts = formatPosts(result);
+  const formattedPosts = formatPosts(result, user.id);
 
   const [totalResult] = await db
     .select({
@@ -319,7 +325,7 @@ export async function getPostById(postId: string): Promise<PostWithAuthorAndStat
     return null;
   }
 
-  return formatPost(result[0]);
+  return formatPost(result[0], user.id);
 }
 
 /**
@@ -349,7 +355,7 @@ export async function getRepliesForPost(
     .offset(offset)
     .limit(limit);
 
-  return formatPosts(result);
+  return formatPosts(result, user.id);
 }
 
 /**
